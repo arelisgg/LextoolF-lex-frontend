@@ -20,6 +20,12 @@ const extractionTask = () =>
   import('@/components/pages/entryA/extractionTask.vue');
 const newEntryA = () => import('@/components/pages/entryA/newEntryA.vue');
 const newSource = () => import('@/components/pages/sourcesA/newSource.vue');
+const documentationTask = () =>
+  import('@/components/pages/ocurrenceRecordA/documentationTask.vue');
+const newOcurrenceRecord = () =>
+  import('@/components/pages/ocurrenceRecordA/newOcurrenceRecord.vue');
+const newVariationRecord = () =>
+  import('@/components/pages/ocurrenceRecordA/newVariationRecord.vue');
 
 export const SiteRoutes: RouteRecordRaw[] & any = [
   {
@@ -111,5 +117,23 @@ export const SiteRoutes: RouteRecordRaw[] & any = [
     exact: true,
     path: 'entries',
     component: entries,
+  },
+  {
+    name: 'documentationTask',
+    exact: true,
+    path: 'documentationTask',
+    component: documentationTask,
+  },
+  {
+    name: 'newOcurrenceRecord',
+    exact: true,
+    path: 'newOcurrenceRecord',
+    component: newOcurrenceRecord,
+  },
+  {
+    name: 'newVariationRecord',
+    exact: true,
+    path: 'newVariationRecord',
+    component: newVariationRecord,
   },
 ];

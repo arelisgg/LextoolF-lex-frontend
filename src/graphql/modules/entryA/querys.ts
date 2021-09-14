@@ -14,6 +14,37 @@ export const findAllEntriesQuery = gql`
   }
 `;
 
+export const findAllEntriesWithDocsQuery = gql`
+  query findAllEntriesWithDocs {
+    findAllEntriesWithDocs {
+      id
+      lemma
+      letter
+      context
+      UF
+      source
+      selected
+      id
+      documentation
+    }
+  }
+`;
+
+export const getEntryByIDWithDocsQuery = gql`
+  query getEntryByIDWithDocs($entryID: String!) {
+    getEntryByIDWithDocs(entryID: $entryID) {
+      id
+      lemma
+      letter
+      context
+      UF
+      source
+      selected
+      documentation
+    }
+  }
+`;
+
 export const getEntryByIDQuery = gql`
   query getEntryByID($entryID: String!) {
     getEntryByID(entryID: $entryID) {
@@ -42,9 +73,9 @@ export const getAllEntriesBySourceIDQuery = gql`
   }
 `;
 
-export const findAllEntriesWhithSourceRefQuery = gql`
-  query findAllEntriesWhithSourceRef {
-    findAllEntriesWhithSourceRef {
+export const findAllEntriesWithSourceRefQuery = gql`
+  query findAllEntriesWithSourceRef {
+    findAllEntriesWithSourceRef {
       id
       lemma
       letter

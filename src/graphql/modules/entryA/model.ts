@@ -3,13 +3,16 @@ import {
   findAllEntriesQuery,
   getEntryByIDQuery,
   getAllEntriesBySourceIDQuery,
-  findAllEntriesWhithSourceRefQuery,
+  findAllEntriesWithSourceRefQuery,
+  findAllEntriesWithDocsQuery,
+  getEntryByIDWithDocsQuery,
 } from './querys';
 import { FetchPolicy, apolloClientA } from '@/graphql/apolloProvider';
 import {
   createEntryMutation,
   deleteEntryByIDMutation,
   updateEntryByIDMutation,
+  updateEntryDocumentationMutation,
 } from './mutations';
 
 export class EntryA {
@@ -22,10 +25,28 @@ export class EntryA {
     );
   }
 
-  static findAllEntriesWhithSourceRef() {
+  static findAllEntriesWithDocs() {
     return apolloQuery(
-      findAllEntriesWhithSourceRefQuery,
+      findAllEntriesWithDocsQuery,
       null,
+      FetchPolicy.network_only,
+      apolloClientA
+    );
+  }
+
+  static findAllEntriesWithSourceRef() {
+    return apolloQuery(
+      findAllEntriesWithSourceRefQuery,
+      null,
+      FetchPolicy.network_only,
+      apolloClientA
+    );
+  }
+
+  static getEntryByIDWithDocs(entryID: String) {
+    return apolloQuery(
+      getEntryByIDWithDocsQuery,
+      { entryID },
       FetchPolicy.network_only,
       apolloClientA
     );
@@ -62,6 +83,16 @@ export class EntryA {
   static updateEntryByID(newEntry: any) {
     return apolloMutate(
       updateEntryByIDMutation,
+      { newEntry: newEntry },
+      null,
+      null,
+      apolloClientA
+    );
+  }
+
+  static updateEntryDocumentation(newEntry: any) {
+    return apolloMutate(
+      updateEntryDocumentationMutation,
       { newEntry: newEntry },
       null,
       null,

@@ -1,5 +1,3 @@
-import { OcurrenceRecordStore } from './ocurrenceRecord';
-
 export class EntryAStore {
   lemma: String;
   letter: String;
@@ -7,5 +5,5 @@ export class EntryAStore {
   UF: String;
   source: String;
   selected: Boolean;
-  documentation: [OcurrenceRecordStore];
+  documentation: [String];
 }

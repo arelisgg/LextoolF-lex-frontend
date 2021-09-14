@@ -1,4 +1,4 @@
-import Vue, { reactive } from 'vue';
+import { reactive } from 'vue';
 import { StudyStore } from './modules/study';
 import { LayoutStore } from './modules/layout/layout.store';
 import { DictionaryStore } from './modules/dictionary';
@@ -37,5 +37,6 @@ export const store = reactive({
   dictionariesA: new DictionaryAStore(),
   lemario: new LemarioStore(),
   entriesA: [EntryAStore],
-  ocurrencies: [OcurrenceRecordStore],
+  entryA: new EntryAStore(),
+  ocurrenceRecord: new OcurrenceRecordStore(),
 });

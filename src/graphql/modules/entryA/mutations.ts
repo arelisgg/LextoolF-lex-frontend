@@ -38,6 +38,22 @@ export const updateEntryByIDMutation = gql`
       UF
       source
       selected
+      documentation
+    }
+  }
+`;
+
+export const updateEntryDocumentationMutation = gql`
+  mutation updateEntryDocumentation($newEntry: EditedEntryType!) {
+    updateEntryDocumentation(newEntry: $newEntry) {
+      id
+      lemma
+      letter
+      context
+      UF
+      source
+      selected
+      documentation
     }
   }
 `;
