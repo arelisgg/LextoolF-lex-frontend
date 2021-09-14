@@ -1,0 +1,292 @@
+<template>
+  <h4>Registro de Ocurrencias de una Variación</h4>
+  <br />
+  <a-form ref="formRef" :model="ocurrenceRecord" :rules="rules">
+    <a-form-item
+      ref="UF"
+      label="Variación de la Unidad Fraseológica"
+      name="UF"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
+    >
+      <a-input
+        v-model:value="ocurrenceRecord.variationUF"
+        style="width: 300px"
+      ></a-input>
+    </a-form-item>
+    <a-form-item
+      ref="corpus_treasure"
+      label="CORPUS/Tesoro"
+      name="corpus_treasure"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
+    >
+      <a-cascader
+        :options="corpus_treasures"
+        :allow-clear="false"
+        style="width: 300px"
+        placeholder="Seleccione un CORPUS o Tesoro"
+        @change="handleOptionsChange"
+      />
+    </a-form-item>
+    <a-form-item
+      ref="numAppearance"
+      label="Número de Apariciones"
+      name="numAppearance"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
+    >
+      <a-input-number
+        v-model:value="ocurrenceRecord.numAppearance"
+        :min="0"
+        :disabled="disabled"
+        :default-value="0"
+      />
+    </a-form-item>
+    <a-form-item
+      ref="numSources"
+      label="Número de Fuentes"
+      name="numSources"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
+    >
+      <a-input-number
+        v-model:value="ocurrenceRecord.numSources"
+        :min="0"
+        :disabled="disabled"
+        :default-value="0"
+      />
+    </a-form-item>
+    <a-form-item>
+      <a-table
+        :data-source="ocurrenceRecord.appearances"
+        :columns="columns"
+        :row-key="(record) => record.name"
+        bordered
+      >
+        <template #title>
+          <a-tooltip
+            v-show="
+              ocurrenceRecord.appearances.length < ocurrenceRecord.numAppearance
+            "
+            title="Agregar Nueva Aparición"
+            placement="right"
+          >
+            <a @click="showModal">
+              Nueva Aparición
+              <PlusSquareFilled
+                :style="{ fontSize: '25px', color: '#08c', margin: '5px' }"
+              />
+            </a>
+          </a-tooltip>
+        </template>
+        <template #operation="{ record }">
+          <a-popconfirm
+            v-if="ocurrenceRecord.appearances.length"
+            title="Seguro de Eliminar?"
+            @confirm="deleteAppearance(record)"
+          >
+            <a>
+              <DeleteFilled
+                :style="{ fontSize: '20px', color: 'red', margin: '5px' }"
+              />
+            </a>
+          </a-popconfirm>
+        </template>
+      </a-table>
+    </a-form-item>
+    <div style="text-align: right">
+      <a-button
+        key="submit"
+        type="primary"
+        :loading="loading"
+        style="margin-right: 5px"
+        @click="createOcurrenceRecord"
+      >
+        Crear
+      </a-button>
+      <a-button key="back" @click="goBack">Cancelar</a-button>
+    </div>
+  </a-form>
+  <new-appearance-modal
+    v-model:visible="newAppearanceModalShow"
+    @close-modal="showModal"
+    @add-appearance="addAppearance"
+  ></new-appearance-modal>
+</template>
+<script lang="ts">
+import { defineComponent, reactive, ref, UnwrapRef } from 'vue';
+import {
+  EyeFilled,
+  EditFilled,
+  DeleteFilled,
+  PlusSquareFilled,
+} from '@ant-design/icons-vue';
+import NewAppearanceModal from './newAppearanceModal.vue';
+import { OcurrenceRecord } from '@/graphql/modules/ocurrenceRecord/model';
+
+export default defineComponent({
+  components: {
+    EyeFilled,
+    EditFilled,
+    DeleteFilled,
+    PlusSquareFilled,
+    NewAppearanceModal,
+  },
+  data() {
+    const columns = [
+      {
+        title: 'Referencia de la Fuente',
+        dataIndex: 'contextSource',
+        key: 'contextSource',
+        sorter: (a, b) => a.name.localeCompare(b.name),
+        slots: {
+          filterDropdown: 'filterDropdown',
+          filterIcon: 'filterIcon',
+        },
+        onFilter: (value, record) => {
+          return record.contextSource
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase());
+        },
+      },
+      {
+        title: 'Operacion',
+        dataIndex: 'operation',
+        width: 150,
+        sorter: true,
+        slots: { customRender: 'operation' },
+      },
+    ];
+    const rules = {};
+    const formRef = ref();
+    const ocurrenceRecord: UnwrapRef<any> = reactive({
+      corpus_treasure: '',
+      variationUF: '',
+      isVariation: true,
+      numAppearance: 0,
+      numSources: 0,
+      appearances: [],
+      status: '',
+    });
+    const newAppearanceModalShow = false;
+    const loading = false;
+    const corpus_treasures = [
+      {
+        value: 'CORPUS',
+        label: 'CORPUS',
+        children: [
+          {
+            value: 'Corpus del Español',
+            label: 'Corpus del Español',
+          },
+          {
+            value: 'CORPES',
+            label: 'CORPES: Corpus del Español del Siglo XXI',
+          },
+          {
+            value: 'CREA',
+            label: 'CREA: Corpus de Referencia del Español Actual',
+          },
+          {
+            value: 'CORDE',
+            label: 'CORDE: Corpus Diacrónico del Español',
+          },
+          {
+            value: 'CDH',
+            label:
+              'CDH: Corpus del Diccionario histórico de la lengua española',
+          },
+          {
+            value: 'CEMC',
+            label: 'CEMC: Corpus del Español Mexicano Contemporáneo',
+          },
+          {
+            value: 'CORDIAM',
+            label:
+              'CORDIAM: Corpus Diacrónico y Diatópico del Español de América',
+          },
+        ],
+      },
+      {
+        value: 'Tesoros',
+        label: 'Tesoros',
+        children: [
+          {
+            value: 'NTLE',
+            label: 'NTLE: Nuevo tesoro lexicográfico de la lengua española',
+          },
+          {
+            value: 'MDA',
+            label: 'MDA: Mapa de diccionarios académicos',
+          },
+          {
+            value: 'TLDEPR',
+            label: 'TLDEPR: Tesoro lexicográfico del español de Puerto Rico',
+          },
+        ],
+      },
+    ];
+    return {
+      loading,
+      newAppearanceModalShow,
+      columns,
+      formRef,
+      ocurrenceRecord,
+      rules,
+      labelCol: { span: 7 },
+      wrapperCol: { span: 14 },
+      disabled: true,
+      corpus_treasures,
+    };
+  },
+  methods: {
+    showModal() {
+      this.newAppearanceModalShow = !this.newAppearanceModalShow;
+    },
+    addAppearance(newAppearance) {
+      console.log(newAppearance);
+      this.ocurrenceRecord.appearances.push(newAppearance);
+      this.showModal();
+    },
+    deleteAppearance(record) {
+      console.log(record);
+      this.ocurrenceRecord.appearances = this.ocurrenceRecord.appearances.filter(
+        (item) =>
+          record.useContext !== item.useContext ||
+          record.contextSource !== item.contextSource
+      );
+    },
+    createOcurrenceRecord() {
+      console.log('this.ocurrenceRecord', this.ocurrenceRecord);
+      this.loading = true;
+      if (
+        this.ocurrenceRecord.appearances.length ===
+        this.ocurrenceRecord.numAppearance
+      ) {
+        this.ocurrenceRecord.status = 'Terminado';
+      }
+      OcurrenceRecord.createOcurrenceRecord(this.ocurrenceRecord);
+      this.$router.push({ name: 'documentationTask' });
+    },
+    goBack() {
+      this.$router.push({ name: 'documentationTask' });
+    },
+    handleOptionsChange(value) {
+      this.disabled = false;
+      this.ocurrenceRecord.corpus_treasure = value[0] + ' ' + value[1];
+      console.log(
+        'this.ocurrenceRecord.corpus_treasure',
+        this.ocurrenceRecord.corpus_treasure
+      );
+      console.log('valueeeeeeeeeeee', value);
+    },
+  },
+});
+</script>
+<style>
+.ant-cascader-menu {
+  height: 235px;
+}
+</style>
