@@ -1,20 +1,11 @@
 <template>
-  <div class="row">
-    <div class="col-md-10">
-      <ul
-        class="nav nav-primary nav-dotted nav-square-separated justify-content-center justify-content-md-start"
-      >
-        <li class="nav-item hvr-forward col-md-10">
-          <a-card hoverable title="Fuente Seleccionada">
-            <p>Nombre: {{ $store.sources.name }}</p>
-            <p>Referencia: {{ $store.sources.ref }}</p>
-            <p>Tipo: {{ $store.sources.type }}</p>
-            <p>Sub-Tipo: {{ $store.sources.subType }}</p>
-          </a-card>
-        </li>
-      </ul>
-    </div>
-  </div>
+  <a-card hoverable title="Fuente Seleccionada">
+    <p>Nombre: {{ $store.sources.name }}</p>
+    <p>Referencia: {{ $store.sources.ref }}</p>
+    <p>Tipo: {{ $store.sources.type }}</p>
+    <p>Sub-Tipo: {{ $store.sources.subType }}</p>
+  </a-card>
+
   <br />
   <a-table
     :data-source="entriesOfTheSource"
@@ -112,17 +103,9 @@ export default defineComponent({
   },
   async mounted() {
     const sourceID = this.$store.sources.id;
-    console.log('sourceID:', sourceID);
     this.selectedSourceID = sourceID.toString();
-    console.log('selectedSourceID esta:', this.selectedSourceID);
-
     const { data } = await EntryA.getAllEntriesBySourceID(sourceID);
-    console.log('data', data);
-
     this.entriesOfTheSource = data.getAllEntriesBySourceID;
-
-    console.log('data', data.getAllEntriesBySourceID);
-    console.log('entriesOfTheSource', this.entriesOfTheSource);
   },
   methods: {
     selectFilterOption(input: string, option: any) {

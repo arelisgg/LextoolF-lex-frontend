@@ -2,7 +2,12 @@
   <h2>Unidades Fraseológicas Candidatas</h2>
   <br />
   <div style="text-align: right">
-    <a-button key="documentar" type="primary" style="margin-right: 5px">
+    <a-button
+      key="documentar"
+      @click="goDocumentation"
+      type="primary"
+      style="margin-right: 5px"
+    >
       Documentar UFs
     </a-button>
     <a-button key="lematizar" type="primary">
@@ -172,8 +177,8 @@ export default defineComponent({
     };
   },
   async mounted() {
-    const { data } = await EntryA.findAllEntriesWhithSourceRef();
-    this.entries = data.findAllEntriesWhithSourceRef;
+    const { data } = await EntryA.findAllEntriesWithSourceRef();
+    this.entries = data.findAllEntriesWithSourceRef;
   },
   methods: {
     async deleteUFByID(id) {
@@ -193,6 +198,9 @@ export default defineComponent({
     },
     handleReset: (clearFilters) => {
       clearFilters();
+    },
+    goDocumentation() {
+      this.$router.push({ name: 'documentationTask' });
     },
     async ufDetailsModalShowMethod(entry) {
       this.selectedEntry = entry;

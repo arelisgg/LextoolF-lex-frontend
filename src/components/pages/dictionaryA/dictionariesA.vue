@@ -219,7 +219,6 @@ export default defineComponent({
   },
   async mounted() {
     const { data } = await DictionaryA.findAllDictionariesA();
-    console.log('Data mounted:', data.findAllDictionariesA);
     this.dictionariesA = data.findAllDictionariesA;
   },
   methods: {
