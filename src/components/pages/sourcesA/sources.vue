@@ -232,14 +232,6 @@ export default defineComponent({
     },
     async deleteSourceByID(id) {
       const deletedSource = await Sources.deleteSourceByID(id);
-      let index = 0;
-      let found = false;
-      for (index; index < this.sources.length && !found; index++) {
-        const element = this.sources[index];
-        if (element.id === id) {
-          found = true;
-        }
-      }
       this.sources = this.sources.filter((item) => item.id !== id);
     },
     handleSearch: (confirm) => {

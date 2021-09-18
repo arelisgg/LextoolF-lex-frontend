@@ -13,6 +13,7 @@ import {
   deleteEntryByIDMutation,
   updateEntryByIDMutation,
   updateEntryDocumentationMutation,
+  deleteEntryDocByIDMutation,
 } from './mutations';
 
 export class EntryA {
@@ -104,6 +105,16 @@ export class EntryA {
     return apolloMutate(
       deleteEntryByIDMutation,
       { entryID },
+      null,
+      null,
+      apolloClientA
+    );
+  }
+
+  static deleteEntryDocByID(orID: String, entryID: String) {
+    return apolloMutate(
+      deleteEntryDocByIDMutation,
+      { orID, entryID },
       null,
       null,
       apolloClientA

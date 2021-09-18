@@ -65,14 +65,11 @@
         bordered
       >
         <template #title>
-          <a-tooltip
-            v-show="
-              ocurrenceRecord.appearances.length < ocurrenceRecord.numAppearance
-            "
-            title="Agregar Nueva Aparición"
-            placement="right"
-          >
-            <a @click="showModal">
+          <a-tooltip title="Agregar Nueva Aparición" placement="right">
+            <a
+              v-show="count < ocurrenceRecord.numAppearance"
+              @click="showModal"
+            >
               Nueva Aparición
               <PlusSquareFilled
                 :style="{ fontSize: '25px', color: '#08c', margin: '5px' }"
@@ -124,6 +121,7 @@ import {
 } from '@ant-design/icons-vue';
 import NewAppearanceModal from './newAppearanceModal.vue';
 import { OcurrenceRecord } from '@/graphql/modules/ocurrenceRecord/model';
+import { EntryA } from '@/graphql/modules/entryA/model.ts';
 
 export default defineComponent({
   components: {
@@ -168,7 +166,7 @@ export default defineComponent({
       numAppearance: 0,
       numSources: 0,
       appearances: [],
-      status: '',
+      status: 'En Proceso',
     });
     const newAppearanceModalShow = false;
     const loading = false;
@@ -233,6 +231,7 @@ export default defineComponent({
       newAppearanceModalShow,
       columns,
       formRef,
+      count: 0,
       ocurrenceRecord,
       rules,
       labelCol: { span: 7 },
@@ -246,7 +245,7 @@ export default defineComponent({
       this.newAppearanceModalShow = !this.newAppearanceModalShow;
     },
     addAppearance(newAppearance) {
-      console.log(newAppearance);
+      this.count++;
       this.ocurrenceRecord.appearances.push(newAppearance);
       this.showModal();
     },
@@ -258,8 +257,7 @@ export default defineComponent({
           record.contextSource !== item.contextSource
       );
     },
-    createOcurrenceRecord() {
-      console.log('this.ocurrenceRecord', this.ocurrenceRecord);
+    async createOcurrenceRecord() {
       this.loading = true;
       if (
         this.ocurrenceRecord.appearances.length ===
@@ -267,7 +265,16 @@ export default defineComponent({
       ) {
         this.ocurrenceRecord.status = 'Terminado';
       }
-      OcurrenceRecord.createOcurrenceRecord(this.ocurrenceRecord);
+      const { data } = await OcurrenceRecord.createOcurrenceRecord(
+        this.ocurrenceRecord
+      );
+      const or = data.createOcurrenceRecord;
+
+      //añadiendo el registro de ocurrencias a la documentacion de la entrada
+      let newEntry = this.$store.entryA;
+      newEntry.documentation.push(or.id);
+      await EntryA.updateEntryDocumentation(newEntry);
+
       this.$router.push({ name: 'documentationTask' });
     },
     goBack() {
@@ -276,11 +283,6 @@ export default defineComponent({
     handleOptionsChange(value) {
       this.disabled = false;
       this.ocurrenceRecord.corpus_treasure = value[0] + ' ' + value[1];
-      console.log(
-        'this.ocurrenceRecord.corpus_treasure',
-        this.ocurrenceRecord.corpus_treasure
-      );
-      console.log('valueeeeeeeeeeee', value);
     },
   },
 });

@@ -1,9 +1,16 @@
 <template>
   <h4>Documentar Unidades Fraseológicas Candidatas</h4>
   <div style="text-align: right">
-    <a-button key="back" type="primary" @click="goEntries">Finalizar</a-button>
+    <a-button
+      key="back"
+      type="primary"
+      style="text-align: right"
+      @click="goEntries"
+    >
+      Finalizar
+    </a-button>
   </div>
-  <a-space direction="horizontal" align="end">
+  <a-space direction="horizontal" align="start">
     <div class="dropdown">
       <div id="myDropdown" class="dropdown-content">
         <a-input-search
@@ -14,6 +21,7 @@
         <a
           v-for="canditateUF in canditateUFs"
           :key="canditateUF.id"
+          :class="{ active: canditateUF.id === activeItem }"
           @click="handleSelectItem(canditateUF)"
         >
           {{ canditateUF.UF }}
@@ -25,7 +33,7 @@
         <a-tab-pane key="1" tab="Registro de Ocurrencias">
           <div v-show="entrySelected.UF === ''">
             <h4 style="padding: 50px">
-              Seleccione una Unidad Fraseológica Candidata en el menu lateral
+              Seleccione una Unidad Fraseológica Candidata en el menú lateral
             </h4>
           </div>
           <div v-show="entrySelected.UF !== ''">
@@ -33,8 +41,8 @@
               :data-source="entryROcurrences"
               :columns="columnsO"
               size="small"
-              :pagination="{ pageSize: 20 }"
-              :scroll="{ y: 190 }"
+              :pagination="{ pageSize: 10 }"
+              :scroll="{ y: 282 }"
               :row-key="(record) => record.id"
               bordered
             >
@@ -51,22 +59,14 @@
                 </a-tooltip>
               </template>
               <template #operation="{ record }">
-                <a-popconfirm
-                  v-if="entrySelected.documentation.length"
-                  title="Seguro de Eliminar?"
-                  @confirm="deleteRoByID(record.id)"
-                >
-                  <a>
-                    <DeleteFilled
-                      :style="{ fontSize: '20px', color: 'red', margin: '5px' }"
-                    />
-                  </a>
-                </a-popconfirm>
                 <a-tooltip
                   title="Detalles del Registro de Ocurrencias"
                   placement="bottom"
                 >
-                  <a @click="roDetailsModalShowMethod(record)">
+                  <a
+                    v-if="record.status === 'Terminado'"
+                    @click="roDetailsModalShowMethod(record)"
+                  >
                     <EyeFilled
                       :style="{
                         fontSize: '20px',
@@ -90,6 +90,17 @@
                     />
                   </a>
                 </a-tooltip>
+                <a-popconfirm
+                  v-if="entrySelected.documentation.length"
+                  title="Seguro de Eliminar?"
+                  @confirm="deleteRoByID(record)"
+                >
+                  <a>
+                    <DeleteFilled
+                      :style="{ fontSize: '20px', color: 'red', margin: '5px' }"
+                    />
+                  </a>
+                </a-popconfirm>
               </template>
             </a-table>
           </div>
@@ -105,8 +116,8 @@
               :data-source="entryRVariations"
               :columns="columnsV"
               size="small"
-              :pagination="{ pageSize: 20 }"
-              :scroll="{ y: 190 }"
+              :pagination="{ pageSize: 10 }"
+              :scroll="{ y: 282 }"
               :row-key="(record) => record.id"
               bordered
             >
@@ -141,7 +152,10 @@
                   title="Detalles del Registro de Variación"
                   placement="bottom"
                 >
-                  <a @click="rvDetailsModalShowMethod(record)">
+                  <a
+                    v-if="record.status === 'Terminado'"
+                    @click="rvDetailsModalShowMethod(record)"
+                  >
                     <EyeFilled
                       :style="{
                         fontSize: '20px',
@@ -152,7 +166,7 @@
                   </a>
                 </a-tooltip>
                 <a-popconfirm
-                  v-if="entryVariations.length"
+                  v-if="entryRVariations.length"
                   title="Seguro de Eliminar?"
                   @confirm="deleteRvByID(record.id)"
                 >
@@ -350,14 +364,45 @@ export default defineComponent({
       entryRVariations: [],
       entryROcurrences: [],
       canditateUFs: [],
+      activeItem: null,
     };
   },
   async mounted() {
     const { data } = await EntryA.findAllEntriesWithDocs();
     this.canditateUFs = data.findAllEntriesWithDocs;
-    console.log('this.entrySelected', this.entrySelected);
   },
   methods: {
+    async deleteRvByID(record) {
+      const entryID = this.entrySelected.id;
+      const vrID = record.id;
+      await EntryA.deleteEntryDocByID(vrID, entryID);
+      await OcurrenceRecord.deleteOcurrenceRecordByID(vrID);
+      this.entrySelected.documentation = this.entrySelected.documentation.filter(
+        (item) =>
+          record.id !== item.id ||
+          record.corpus_treasure !== item.corpus_treasure ||
+          record.numAppearance !== item.numAppearance ||
+          record.numSources !== item.numSources ||
+          record.variationUF !== item.variationUF ||
+          record.isVariation !== item.isVariation ||
+          record.status !== item.status
+      );
+    },
+    async deleteRoByID(record) {
+      const entryID = this.entrySelected.id;
+      const orID = record.id;
+      await EntryA.deleteEntryDocByID(orID, entryID);
+      await OcurrenceRecord.deleteOcurrenceRecordByID(orID);
+
+      this.entryROcurrences = this.entryROcurrences.filter(
+        (item) =>
+          record.id !== item.id ||
+          record.corpus_treasure !== item.corpus_treasure ||
+          record.numAppearance !== item.numAppearance ||
+          record.numSources !== item.numSources ||
+          record.status !== item.status
+      );
+    },
     ocurrenceRecordDetailsShowMethod(record) {
       this.selectedOcurrenceRecord = record;
       this.ocurrenceRecordDetailsShow = !this.ocurrenceRecordDetailsShow;
@@ -367,13 +412,11 @@ export default defineComponent({
     },
     async onAddOR() {
       const { data } = await EntryA.getEntryByIDWithDocs(this.entrySelected.id);
-      console.log('this.entrySelected.id', this.entrySelected.id);
       this.$store.entryA = data.getEntryByIDWithDocs;
       this.$router.push({ name: 'newOcurrenceRecord' });
     },
     async onAddVR() {
       const { data } = await EntryA.getEntryByIDWithDocs(this.entrySelected.id);
-      console.log('this.entrySelected.id', this.entrySelected.id);
       this.$store.entryA = data.getEntryByIDWithDocs;
       this.$router.push({ name: 'newVariationRecord' });
     },
@@ -394,7 +437,10 @@ export default defineComponent({
     },
     async handleSelectItem(canditateUF) {
       this.entrySelected = canditateUF;
+      this.activeItem = canditateUF.id;
       let d = this.entrySelected.documentation;
+      this.entryRVariations = [];
+      this.entryROcurrences = [];
       let index = 0;
       if (d !== null) {
         for (index; index < d.length; index++) {
@@ -403,7 +449,6 @@ export default defineComponent({
             element
           );
           const or = data.getOcurrenceRecordByID;
-          console.log('or', or);
           if (or.isVariation) {
             this.entryRVariations.push(or);
           } else {
@@ -433,20 +478,16 @@ export default defineComponent({
   background: '#fff';
   padding-left: '24px';
   width: 800px;
-  height: 400px;
-  min-width: 800px;
-  min-height: 400px;
+  height: 493px;
 }
 
 .dropdown-content {
   display: show;
+  margin-top: 46px;
   background-color: #f6f6f6;
-  min-width: 250px;
-  min-height: 356px;
   width: 250px;
-  height: 356px;
+  height: 393px;
   overflow: auto;
-  border: 1px solid #ddd;
   border-radius: 2px;
   z-index: 1;
 }
@@ -459,6 +500,10 @@ export default defineComponent({
 }
 
 .dropdown a:hover {
+  background-color: #ddd;
+}
+
+.dropdown a.active {
   background-color: #ddd;
 }
 </style>

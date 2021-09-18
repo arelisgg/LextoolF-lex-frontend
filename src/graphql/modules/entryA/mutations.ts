@@ -14,6 +14,21 @@ export const deleteEntryByIDMutation = gql`
   }
 `;
 
+export const deleteEntryDocByIDMutation = gql`
+  mutation deleteEntryDocByID($orID: String!, $entryID: String!) {
+    deleteEntryDocByID(orID: $orID, entryID: $entryID) {
+      id
+      lemma
+      letter
+      context
+      UF
+      source
+      selected
+      documentation
+    }
+  }
+`;
+
 export const createEntryMutation = gql`
   mutation createEntry($createdEntry: NewEntryType!) {
     createEntry(createdEntry: $createdEntry) {

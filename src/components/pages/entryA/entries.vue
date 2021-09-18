@@ -4,14 +4,11 @@
   <div style="text-align: right">
     <a-button
       key="documentar"
-      @click="goDocumentation"
       type="primary"
       style="margin-right: 5px"
+      @click="goDocumentation"
     >
       Documentar UFs
-    </a-button>
-    <a-button key="lematizar" type="primary">
-      Criterios de Lematización
     </a-button>
   </div>
   <br />
@@ -109,7 +106,6 @@ import {
 } from '@ant-design/icons-vue';
 import { defineComponent, ref } from 'vue';
 import { EntryA } from '@/graphql/modules/entryA/model.ts';
-import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 import Table from 'ant-design-vue/lib/table';
 import EntryDetailsModal from './entryDetailsModal.vue';
 
@@ -191,7 +187,7 @@ export default defineComponent({
         }
       }
       this.entries = this.entries.filter((item) => item.id !== id);
-      const deletedUF = await EntryA.deleteEntryByID(id);
+      await EntryA.deleteEntryByID(id);
     },
     handleSearch: (confirm) => {
       confirm();

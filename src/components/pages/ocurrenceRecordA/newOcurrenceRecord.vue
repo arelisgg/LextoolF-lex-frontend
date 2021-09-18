@@ -230,12 +230,10 @@ export default defineComponent({
       this.newAppearanceModalShow = !this.newAppearanceModalShow;
     },
     addAppearance(newAppearance) {
-      console.log('newAppearance', newAppearance);
       if (this.count < this.ocurrenceRecord.numAppearance) {
         console.log('this.count', this.count);
       }
       this.count++;
-      console.log('this.count', this.count);
       this.ocurrenceRecord.appearances.push(newAppearance);
       this.showModal();
     },
@@ -265,11 +263,8 @@ export default defineComponent({
       //añadiendo el registro de ocurrencias a la documentacion de la entrada
 
       let newEntry = this.$store.entryA;
-      console.log('newEntry', newEntry);
       newEntry.documentation.push(or.id);
-      console.log('newEntry', newEntry);
-      console.log('or.id', or.id);
-      EntryA.updateEntryDocumentation(newEntry);
+      await EntryA.updateEntryDocumentation(newEntry);
 
       this.$router.push({ name: 'documentationTask' });
     },
