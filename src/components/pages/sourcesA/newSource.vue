@@ -577,6 +577,16 @@ export default defineComponent({
           });
       }
 
+      let claves = Object.keys(this.source); // claves = ["nombre", "color", "macho", "edad"]
+      console.log('claves', claves);
+      for (let i = 0; i < claves.length; i++) {
+        let clave = claves[i];
+        console.log(this.source[clave]);
+        if (this.source[clave] === '') {
+          this.source[clave] = '( No Definido )';
+        }
+      }
+      console.log('this.source', this.source);
       Sources.createSource(this.source);
       this.$router.push({ name: 'sources' });
     },

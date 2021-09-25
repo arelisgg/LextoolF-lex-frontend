@@ -103,7 +103,7 @@ export const SiteRoutes: RouteRecordRaw[] & any = [
   {
     name: 'extractionTask',
     exact: true,
-    path: 'extractionTask',
+    path: 'extractionTask/:source',
     component: extractionTask,
   },
   {

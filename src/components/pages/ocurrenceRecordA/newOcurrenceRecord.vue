@@ -1,6 +1,112 @@
 <template>
-  <h4>Registro de Ocurrencias</h4>
-  <br />
+  <a-page-header>
+    <template #title>
+      <h4>Registro de Ocurrencias</h4>
+    </template>
+    <template #extra>
+      <a-tooltip
+        title="Acceso a los sitios oficiales de Corpus y Tesoros Linguísticos"
+        placement="topRight"
+      >
+        <a-button type="primary" @click="showDrawer">
+          <LinkOutlined />
+          Corpus/Tesoros
+        </a-button>
+      </a-tooltip>
+    </template>
+  </a-page-header>
+  <a-drawer
+    title="Corpus y Tesoros Online"
+    placement="right"
+    :closable="false"
+    :visible="visible"
+    :after-visible-change="afterVisibleChange"
+    @close="onClose"
+  >
+    <h6>Corpus</h6>
+    <ul style="padding-left: 0px">
+      <li class="nav-item hvr-forward">
+        <a
+          class="nav-link"
+          href="https://www.corpusdelespanol.org/xs.asp"
+          target="_blank"
+        >
+          Corpus del español
+        </a>
+      </li>
+      <li class="nav-item hvr-forward">
+        <a
+          class="nav-link"
+          target="_blank"
+          href="https://apps2.rae.es/CORPES/view/inicioExterno.view;jsessionid=8A846C32D0144E8A763724C90BB2AA1B"
+        >
+          CORPES
+        </a>
+      </li>
+      <li class="nav-item hvr-forward">
+        <a
+          class="nav-link"
+          target="_blank"
+          href="https://apps2.rae.es/CREA/view/inicioExterno.view"
+        >
+          CREA
+        </a>
+      </li>
+      <li class="nav-item hvr-forward">
+        <a
+          class="nav-link"
+          href="http://corpus.rae.es/cordenet.html"
+          target="_blank"
+        >
+          CORDE
+        </a>
+      </li>
+      <li class="nav-item hvr-forward">
+        <a
+          class="nav-link"
+          target="_blank"
+          href="https://apps.rae.es/CNDHE/view/inicioExterno.view"
+        >
+          CDH
+        </a>
+      </li>
+      <li class="nav-item hvr-forward">
+        <a class="nav-link" target="_blank" href="https://cemc.colmex.mx">
+          CEMC
+        </a>
+      </li>
+      <li class="nav-item hvr-forward">
+        <a class="nav-link" target="_blank" href="https://www.cordiam.org/">
+          CORDIAM
+        </a>
+      </li>
+    </ul>
+    <a-divider />
+    <h6>Tesoros</h6>
+    <ul style="padding-left: 0px">
+      <li class="nav-item hvr-forward">
+        <a
+          class="nav-link"
+          target="_blank"
+          href="http://ntlle.rae.es/ntlle/SrvltGUILoginNtlle"
+        >
+          NTLE
+        </a>
+      </li>
+      <li class="nav-item hvr-forward">
+        <a
+          class="nav-link"
+          target="_blank"
+          href="https://apps2.rae.es/ntllet/SrvltGUILoginNtlletPub"
+        >
+          MDA
+        </a>
+      </li>
+      <li class="nav-item hvr-forward">
+        <a class="nav-link" target="_blank" href="https://tesoro.pr/">TLDEPR</a>
+      </li>
+    </ul>
+  </a-drawer>
   <a-form ref="formRef" :model="ocurrenceRecord" :rules="rules">
     <a-form-item
       ref="corpus_treasure"
@@ -12,7 +118,7 @@
       <a-cascader
         :options="corpus_treasures"
         :allow-clear="false"
-        style="width: 300px"
+        style="width: 400px"
         placeholder="Seleccione un CORPUS o Tesoro"
         @change="handleOptionsChange"
       />
@@ -105,6 +211,7 @@ import {
   EditFilled,
   DeleteFilled,
   PlusSquareFilled,
+  LinkOutlined,
 } from '@ant-design/icons-vue';
 import NewAppearanceModal from './newAppearanceModal.vue';
 import { OcurrenceRecord } from '@/graphql/modules/ocurrenceRecord/model';
@@ -117,6 +224,7 @@ export default defineComponent({
     DeleteFilled,
     PlusSquareFilled,
     NewAppearanceModal,
+    LinkOutlined,
   },
   data() {
     const columns = [
@@ -223,9 +331,19 @@ export default defineComponent({
       wrapperCol: { span: 14 },
       disabled: true,
       corpus_treasures,
+      visible: false,
     };
   },
   methods: {
+    afterVisibleChange(val) {
+      console.log('visible', val);
+    },
+    showDrawer() {
+      this.visible = true;
+    },
+    onClose() {
+      this.visible = false;
+    },
     showModal() {
       this.newAppearanceModalShow = !this.newAppearanceModalShow;
     },

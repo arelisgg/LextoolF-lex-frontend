@@ -11,7 +11,7 @@
     >
       <a-input v-model:value="entryA.UF"></a-input>
     </a-form-item>
-    <div v-show="$store.sources.support === 'Video'">
+    <div v-show="selectedSource.support === 'Video'">
       <a-form-item
         ref="context"
         label="Contexto"
@@ -53,7 +53,7 @@
         ></video>
       </a-form-item>
     </div>
-    <div v-show="$store.sources.support === 'Audio'">
+    <div v-show="selectedSource.support === 'Audio'">
       <a-form-item
         ref="context"
         label="Contexto"
@@ -121,6 +121,7 @@ import {
   DeleteFilled,
 } from '@ant-design/icons-vue';
 import { EntryA } from '@/graphql/modules/entryA/model';
+import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 
 import { base64ImageToFile, readImageAsUrl } from '../../../utils/images';
 import VueCroppie from './VueCroppie.vue';
@@ -178,16 +179,26 @@ export default defineComponent({
       videoPreview: '',
       uploadProgress: 0,
       uploadProgressAudio: 0,
+      selectedSource: {},
     };
   },
-
+  async mounted() {
+    const sID = this.$route.params.source.toString();
+    const s = await Sources.getSourceByID(sID);
+    this.selectedSource = s.data.getSourceByID;
+  },
   methods: {
     createEntryA() {
       console.log(this.entryA);
       this.loading = true;
-      this.entryA.source = this.$route.params.source.toString();
+      this.entryA.source = this.selectedSource.id;
       EntryA.createEntry(this.entryA);
-      this.$router.push({ name: 'extractionTask' });
+      this.$router.push({
+        name: 'newEntryA',
+        params: {
+          source: this.selectedSource.id,
+        },
+      });
     },
     //file Video
     onFileSelectedV(event) {

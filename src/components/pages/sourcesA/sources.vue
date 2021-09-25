@@ -249,8 +249,13 @@ export default defineComponent({
     },
     async selectSourceToWork(sourceID) {
       const { data } = await Sources.getSourceByID(sourceID);
-      this.$store.sources = data.getSourceByID;
-      this.$router.push({ name: 'extractionTask' });
+      this.selectedSource = data.getSourceByID;
+      this.$router.push({
+        name: 'extractionTask',
+        params: {
+          source: sourceID,
+        },
+      });
     },
   },
 });

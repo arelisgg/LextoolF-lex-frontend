@@ -1,11 +1,90 @@
 <template>
   <a-card hoverable title="Fuente Seleccionada">
-    <p>Nombre: {{ $store.sources.name }}</p>
-    <p>Referencia: {{ $store.sources.ref }}</p>
-    <p>Tipo: {{ $store.sources.type }}</p>
-    <p>Sub-Tipo: {{ $store.sources.subType }}</p>
+    <a-descriptions>
+      <a-descriptions-item label="Nombre">
+        {{ selectedSource.name }}
+      </a-descriptions-item>
+      <a-descriptions-item label="Referencia" :span="2">
+        {{ selectedSource.ref }}
+      </a-descriptions-item>
+      <a-descriptions-item label="Tipo">
+        {{ selectedSource.type }}
+      </a-descriptions-item>
+      <a-descriptions-item label="Medio">
+        {{ selectedSource.subType }}
+      </a-descriptions-item>
+      <a-descriptions-item label="Soporte">
+        {{ selectedSource.support }}
+      </a-descriptions-item>
+    </a-descriptions>
+    <div v-if="selectedSource.type === 'Linguística'">
+      <a-descriptions>
+        <a-descriptions-item label="Bloque">
+          {{ selectedSource.bloque }}
+        </a-descriptions-item>
+        <a-descriptions-item
+          v-if="selectedSource.bloque === 'NoFicción'"
+          label="Tema"
+        >
+          {{ selectedSource.theme }}
+        </a-descriptions-item>
+        <a-descriptions-item
+          v-if="selectedSource.bloque === 'Ficción'"
+          label="Género"
+        >
+          {{ selectedSource.theme }}
+        </a-descriptions-item>
+      </a-descriptions>
+      <div v-if="selectedSource.support === 'Publicación Periódica'">
+        <a-descriptions>
+          <a-descriptions-item label="Sección del Periódico">
+            {{ selectedSource.session_p }}
+          </a-descriptions-item>
+          <a-descriptions-item label="Tipo de revista">
+            {{ selectedSource.magazine_type_p }}
+          </a-descriptions-item>
+        </a-descriptions>
+      </div>
+      <div v-if="selectedSource.subType === 'Oral'">
+        <a-descriptions>
+          <a-descriptions-item label="Descripción del Hablante" :span="2">
+            {{ selectedSource.speaker }}
+          </a-descriptions-item>
+          <a-descriptions-item label="Medio de Difusión">
+            {{ selectedSource.broadcastMedium }}
+          </a-descriptions-item>
+          <a-descriptions-item label="Tipología">
+            {{ selectedSource.typology }}
+          </a-descriptions-item>
+          <a-descriptions-item label="Duración">
+            {{ selectedSource.cantMin }}
+          </a-descriptions-item>
+          <a-descriptions-item label="Fecha de grabación">
+            {{ selectedSource.recording_date }}
+          </a-descriptions-item>
+          <a-descriptions-item label="Fecha de emisión">
+            {{ selectedSource.broadcast_date }}
+          </a-descriptions-item>
+        </a-descriptions>
+      </div>
+    </div>
+    <div v-if="selectedSource.type === 'Metalinguística'">
+      <a-descriptions>
+        <a-descriptions-item label="Tipo de Diccionario">
+          {{ selectedSource.dictionaryType }}
+        </a-descriptions-item>
+        <a-descriptions-item label="Siglo">
+          {{ selectedSource.century }}
+        </a-descriptions-item>
+        <a-descriptions-item label="Nombre de la biblioteca">
+          {{ selectedSource.library_name }}
+        </a-descriptions-item>
+        <a-descriptions-item label="Localización URL">
+          {{ selectedSource.url_location }}
+        </a-descriptions-item>
+      </a-descriptions>
+    </div>
   </a-card>
-
   <br />
   <a-table
     :data-source="entriesOfTheSource"
@@ -62,6 +141,7 @@ import {
   PlusSquareFilled,
 } from '@ant-design/icons-vue';
 import { defineComponent } from 'vue';
+import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 import { EntryA } from '@/graphql/modules/entryA/model.ts';
 import EntryDetailsModal from './entryDetailsModal.vue';
 
@@ -75,7 +155,6 @@ export default defineComponent({
   data() {
     const selectedEntry = {};
     const fileType = '';
-    const selectedSourceID = '';
     const entryDetailsModalShow = false;
     const columns = [
       {
@@ -97,17 +176,36 @@ export default defineComponent({
       fileType,
       entryDetailsModalShow,
       columns,
-      selectedSourceID,
+      selectedSource: {},
       entriesOfTheSource: [],
     };
   },
   async mounted() {
-    const sourceID = this.$store.sources.id;
-    this.selectedSourceID = sourceID.toString();
-    const { data } = await EntryA.getAllEntriesBySourceID(sourceID);
+    const sID = this.$route.params.source.toString();
+    console.log('sID', sID);
+    const s = await Sources.getSourceByID(sID);
+    console.log('s', s);
+    this.selectedSource = s.data.getSourceByID;
+    console.log('this.selectedSource', this.selectedSource);
+
+    const { data } = await EntryA.getAllEntriesBySourceID(sID);
     this.entriesOfTheSource = data.getAllEntriesBySourceID;
   },
   methods: {
+    async deleteEntryByID(id) {
+      let index = 0;
+      let found = false;
+      for (index; index < this.entriesOfTheSource.length && !found; index++) {
+        const element = this.entriesOfTheSource[index];
+        if (element.id === id) {
+          found = true;
+        }
+      }
+      this.entriesOfTheSource = this.entriesOfTheSource.filter(
+        (item) => item.id !== id
+      );
+      await EntryA.deleteEntryByID(id);
+    },
     selectFilterOption(input: string, option: any) {
       return (
         option.props.value.name.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -117,7 +215,7 @@ export default defineComponent({
       this.$router.push({
         name: 'newEntryA',
         params: {
-          source: this.selectedSourceID,
+          source: this.selectedSource.id,
         },
       });
     },

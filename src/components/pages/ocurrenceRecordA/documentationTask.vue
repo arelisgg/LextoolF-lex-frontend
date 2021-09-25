@@ -1,15 +1,24 @@
 <template>
-  <h4>Documentar Unidades Fraseológicas Candidatas</h4>
-  <div style="text-align: right">
-    <a-button
-      key="back"
-      type="primary"
-      style="text-align: right"
-      @click="goEntries"
-    >
-      Finalizar
-    </a-button>
-  </div>
+  <a-page-header>
+    <template #title>
+      <h4>Documentar Unidades Fraseológicas Candidatas</h4>
+    </template>
+    <template #extra>
+      <a-tooltip
+        title="Finalizar Tarea de Documentación Unidades Fraseológicas Candidatas"
+        placement="bottom"
+      >
+        <a-button
+          key="back"
+          type="primary"
+          style="text-align: right"
+          @click="goEntries"
+        >
+          Finalizar
+        </a-button>
+      </a-tooltip>
+    </template>
+  </a-page-header>
   <a-space direction="horizontal" align="start">
     <div class="dropdown">
       <div id="myDropdown" class="dropdown-content">

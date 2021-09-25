@@ -1,17 +1,24 @@
 <template>
-  <h2>Unidades Fraseológicas Candidatas</h2>
-  <br />
-  <div style="text-align: right">
-    <a-button
-      key="documentar"
-      type="primary"
-      style="margin-right: 5px"
-      @click="goDocumentation"
-    >
-      Documentar UFs
-    </a-button>
-  </div>
-  <br />
+  <a-page-header>
+    <template #title>
+      <h2>Unidades Fraseológicas Candidatas</h2>
+    </template>
+    <template #extra>
+      <a-tooltip
+        title="Documentar Unidades Fraseológicas Candidatas"
+        placement="bottom"
+      >
+        <a-button
+          key="documentar"
+          type="primary"
+          style="margin-right: 5px"
+          @click="goDocumentation"
+        >
+          Documentar UFs
+        </a-button>
+      </a-tooltip>
+    </template>
+  </a-page-header>
   <a-table
     :data-source="entries"
     :columns="columns"
