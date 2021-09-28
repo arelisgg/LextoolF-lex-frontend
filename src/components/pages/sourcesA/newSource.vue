@@ -299,9 +299,7 @@ import {
 import { Sources } from '@/graphql/modules/sourcesA/model';
 import VueDocPreview from 'vue-doc-preview';
 import { InboxOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
-import { defineComponent, ref } from 'vue';
-import { axiosClientPostImage } from '@/plugins/axios';
+import { defineComponent } from 'vue';
 import moment from 'moment';
 
 export default defineComponent({
@@ -488,16 +486,6 @@ export default defineComponent({
         sm: { span: 20, offset: 4 },
       },
     };
-    const formItemLayoutModal = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 4 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 20 },
-      },
-    };
     return {
       options,
       rules,
@@ -510,7 +498,6 @@ export default defineComponent({
       broadcastMediums,
       typologies,
       dictionariesTypes,
-      selectedFile: null,
       formItemLayoutWithOutLabelModal,
       source,
       labelColModal: { span: 8 },
@@ -530,7 +517,6 @@ export default defineComponent({
       console.log('cantMin', this.source.cantMin);
     },
     onChangeRecording_date(date) {
-      let d = new Date(date);
       let month = date.format('M');
       let day = date.format('D');
       let year = date.format('YYYY');
@@ -538,8 +524,7 @@ export default defineComponent({
       this.source.recording_date = fecha;
       console.log('date', fecha);
     },
-    onChangeBroadcast_date(date, dateString) {
-      let d = new Date(date);
+    onChangeBroadcast_date(date) {
       let month = date.format('M');
       let day = date.format('D');
       let year = date.format('YYYY');
@@ -557,26 +542,6 @@ export default defineComponent({
     submit() {
       console.log(this.source);
 
-      if (!(this.selectedFile === null)) {
-        const element = this.selectedFile;
-        const extensionFile = '.' + element.name.split('.')[1];
-        const date = Date.now();
-        this.source.file = 'source_' + date + extensionFile;
-        console.log('file name', this.source.file);
-
-        const formData = new FormData();
-        console.log(this.selectedFile);
-        formData.append('file', this.selectedFile);
-        axiosClientPostImage
-          .post(`/${this.source.file}`, formData)
-          .then(function () {
-            console.log('SUCCESS!!');
-          })
-          .catch(function () {
-            console.log('FAILURE!!');
-          });
-      }
-
       let claves = Object.keys(this.source); // claves = ["nombre", "color", "macho", "edad"]
       console.log('claves', claves);
       for (let i = 0; i < claves.length; i++) {
@@ -592,9 +557,6 @@ export default defineComponent({
     },
     goBack() {
       this.$router.push({ name: 'sources' });
-    },
-    onFileSelected(event) {
-      this.selectedFile = event.target.files[0];
     },
     handleOptionsChange(value) {
       console.log('valueeeeeeeeeeee', value);

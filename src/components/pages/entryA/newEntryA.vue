@@ -11,6 +11,31 @@
     >
       <a-input v-model:value="entryA.UF"></a-input>
     </a-form-item>
+    <div v-show="selectedSource.subType === 'Escrita'">
+      <croppie-modal @crop="crop"></croppie-modal>
+      <a-form-item
+        v-if="image !== null && showPreviewImage"
+        ref="context"
+        label="Contexto"
+        name="context"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <img v-show="image !== null && showPreviewImage" :src="image.base64" />
+      </a-form-item>
+      <a-form-item
+        v-else
+        label="Info"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-alert
+          message='Click en cualquier parte de la ventana y luego "CTRL + V" para pegar la Imagen'
+          type="info"
+          show-icon
+        />
+      </a-form-item>
+    </div>
     <div v-show="selectedSource.support === 'Video'">
       <a-form-item
         ref="context"
@@ -20,8 +45,8 @@
         :wrapper-col="wrapperCol"
       >
         <input
-          type="file"
           ref="fileInput"
+          type="file"
           name="file"
           style="display: none"
           accept="video/mp4,video/x-m4v,video/*"
@@ -30,23 +55,15 @@
         <a-button type="primary" @click="$refs.fileInput.click()">
           Seleccione el Video
         </a-button>
-        <a-button
-          :disabled="!selectedFile"
-          style="margin-left: 8px"
-          key="upload"
-          type="primary"
-          :loading="loading"
-          @click="uploadFileVideo"
-        >
-          Subir
-        </a-button>
         <br />
-        <span v-if="!selectedFile" class="file-info">No files selected</span>
+        <span v-if="!selectedFile" class="file-info">
+          Ningún archivo seleccionado
+        </span>
         <span v-else class="file-info">{{ selectedFile.name }}</span>
         <br />
         <video
-          v-bind:src="videoPreview"
           v-show="showPreview"
+          :src="videoPreview"
           width="320"
           height="240"
           controls
@@ -62,8 +79,8 @@
         :wrapper-col="wrapperCol"
       >
         <input
-          type="file"
           ref="fileInputA"
+          type="file"
           name="file"
           style="display: none"
           accept="audio/*"
@@ -72,25 +89,13 @@
         <a-button type="primary" @click="$refs.fileInputA.click()">
           Seleccione el Audio
         </a-button>
-        <a-button
-          :disabled="!selectedFile"
-          style="margin-left: 8px"
-          key="uploadA"
-          type="primary"
-          :loading="loading"
-          @click="uploadFileAudio"
-        >
-          Subir
-        </a-button>
         <br />
-        <span v-if="!selectedFile" class="file-info">No files selected</span>
+        <span v-if="!selectedFile" class="file-info">
+          Ningún archivo seleccionado
+        </span>
         <span v-else class="file-info">{{ selectedFile.name }}</span>
         <br />
-        <audio
-          v-bind:src="audioPreview"
-          v-show="showPreviewAudio"
-          controls
-        ></audio>
+        <audio v-show="showPreviewAudio" :src="audioPreview" controls></audio>
       </a-form-item>
     </div>
     <div style="text-align: right">
@@ -99,7 +104,7 @@
         type="primary"
         :loading="loading"
         style="margin-left: 5px"
-        @click="createEntryA"
+        @click="submit"
       >
         Crear
       </a-button>
@@ -108,7 +113,7 @@
   </a-form>
 </template>
 <script lang="ts">
-import Vue, { defineComponent, reactive, ref, UnwrapRef, h } from 'vue';
+import { defineComponent, ref } from 'vue';
 import {
   PlusOutlined,
   MinusCircleFilled,
@@ -123,15 +128,9 @@ import {
 import { EntryA } from '@/graphql/modules/entryA/model';
 import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 
-import { base64ImageToFile, readImageAsUrl } from '../../../utils/images';
-import VueCroppie from './VueCroppie.vue';
+import CroppieModal from './VueCroppie/CroppieModal.vue';
 import { axiosClientPostImage } from '@/plugins/axios';
 
-function getBase64(img: Blob, callback: (base64Url: string) => void) {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result as string));
-  reader.readAsDataURL(img);
-}
 export default defineComponent({
   components: {
     PlusOutlined,
@@ -143,7 +142,7 @@ export default defineComponent({
     EyeFilled,
     EditFilled,
     DeleteFilled,
-    'vue-croppie': VueCroppie,
+    'croppie-modal': CroppieModal,
   },
   data() {
     const rules = {
@@ -166,6 +165,10 @@ export default defineComponent({
       selected: false,
     };
     return {
+      image: {
+        base64: null,
+        file: null,
+      },
       loading,
       entryA,
       formRef,
@@ -179,6 +182,7 @@ export default defineComponent({
       videoPreview: '',
       uploadProgress: 0,
       uploadProgressAudio: 0,
+      uploadProgressImage: 0,
       selectedSource: {},
     };
   },
@@ -188,19 +192,29 @@ export default defineComponent({
     this.selectedSource = s.data.getSourceByID;
   },
   methods: {
+    async submit() {
+      if (this.selectedFile) {
+        if (/\.(mp4|avi|x-m4v)$/i.test(this.selectedFile.name)) {
+          this.uploadFileVideo();
+        }
+        if (
+          /\.(mp3|m4a|wav|wma|flac|aac|opus)$/i.test(this.selectedFile.name)
+        ) {
+          this.uploadFileAudio();
+        }
+      }
+      if (this.image.file !== null) {
+        this.uploadFileImage();
+      }
+      this.createEntryA();
+      this.$router.push({ name: 'extractionTask' });
+    },
     createEntryA() {
-      console.log(this.entryA);
       this.loading = true;
       this.entryA.source = this.selectedSource.id;
       EntryA.createEntry(this.entryA);
-      this.$router.push({
-        name: 'newEntryA',
-        params: {
-          source: this.selectedSource.id,
-        },
-      });
     },
-    //file Video
+    //file Videos
     onFileSelectedV(event) {
       this.selectedFile = event.target.files[0];
       let reader = new FileReader();
@@ -249,6 +263,44 @@ export default defineComponent({
             console.log('FAILURE!!');
           });
       }
+    },
+    //file image
+    crop(e) {
+      this.image = e;
+      console.log('this.image', this.image);
+      if (this.image.file) {
+        this.showPreviewImage = true;
+      }
+    },
+    uploadFileImage() {
+      const fileImage = this.image;
+      const element = fileImage.file;
+      const extensionFile = '.' + element.name.split('.')[1];
+      const date = Date.now();
+      this.entryA.context = 'Image_context_' + date + extensionFile;
+      console.log('file name', this.entryA.context);
+
+      const config = {
+        onUploadProgress: function (progressEvent) {
+          this.uploadProgressImage = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          console.log(this.uploadProgressImage);
+        },
+      };
+
+      const formData = new FormData();
+      formData.append('file', fileImage.file);
+      axiosClientPostImage
+        .post(`/${this.entryA.context}`, formData, config)
+        .then(function () {
+          console.log('SUCCESS!!');
+          this.openNotificationWithIcon('success');
+        })
+        .catch(function () {
+          console.log('FAILURE!!');
+          this.openNotificationWithIcon('error');
+        });
     },
     //file Audio
     onFileSelectedA(event) {

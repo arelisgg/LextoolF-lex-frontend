@@ -231,37 +231,12 @@ export default defineComponent({
     };
     const columnsO = [
       {
-        title: 'CORPUS/Tesoro',
-        dataIndex: 'corpus_treasure',
-        key: 'corpus_treasure',
-        width: 100,
-        sorter: (a, b) => a.name.localeCompare(b.name),
-        slots: {
-          filterDropdown: 'filterDropdown',
-          filterIcon: 'filterIcon',
-        },
-        onFilter: (value, record) => {
-          return record.corpus_treasure
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        },
-      },
-      {
         title: 'No. Apariciones',
         dataIndex: 'numAppearance',
         key: 'numAppearance',
         width: 100,
         sorter: true,
         slots: { customRender: 'numAppearance' },
-      },
-      {
-        title: 'No. Fuentes',
-        dataIndex: 'numSources',
-        key: 'numSources',
-        width: 100,
-        sorter: true,
-        slots: { customRender: 'numSources' },
       },
       {
         title: 'Estado',
@@ -306,37 +281,12 @@ export default defineComponent({
         },
       },
       {
-        title: 'CORPUS/Tesoro',
-        dataIndex: 'corpus_treasure',
-        key: 'corpus_treasure',
-        width: 100,
-        sorter: (a, b) => a.name.localeCompare(b.name),
-        slots: {
-          filterDropdown: 'filterDropdown',
-          filterIcon: 'filterIcon',
-        },
-        onFilter: (value, record) => {
-          return record.corpus_treasure
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        },
-      },
-      {
         title: 'No. Apariciones',
         dataIndex: 'numAppearance',
         key: 'numAppearance',
         width: 100,
         sorter: true,
         slots: { customRender: 'numAppearance' },
-      },
-      {
-        title: 'No. Fuentes',
-        dataIndex: 'numSources',
-        key: 'numSources',
-        width: 100,
-        sorter: true,
-        slots: { customRender: 'numSources' },
       },
       {
         title: 'Estado',
@@ -389,7 +339,6 @@ export default defineComponent({
       this.entrySelected.documentation = this.entrySelected.documentation.filter(
         (item) =>
           record.id !== item.id ||
-          record.corpus_treasure !== item.corpus_treasure ||
           record.numAppearance !== item.numAppearance ||
           record.numSources !== item.numSources ||
           record.variationUF !== item.variationUF ||
@@ -406,7 +355,6 @@ export default defineComponent({
       this.entryROcurrences = this.entryROcurrences.filter(
         (item) =>
           record.id !== item.id ||
-          record.corpus_treasure !== item.corpus_treasure ||
           record.numAppearance !== item.numAppearance ||
           record.numSources !== item.numSources ||
           record.status !== item.status

@@ -4,12 +4,10 @@ export const getAllOcurrenceRecordsQuery = gql`
   query getAllOcurrenceRecords {
     getAllOcurrenceRecords {
       id
-      corpus_treasure
+      source
       numAppearance
-      numSources
       appearances {
         useContext
-        contextSource
       }
       isVariation
       variationUF
@@ -22,12 +20,10 @@ export const getOcurrenceRecordByIDQuery = gql`
   query getOcurrenceRecordByID($orID: String!) {
     getOcurrenceRecordByID(orID: $orID) {
       id
-      corpus_treasure
+      source
       numAppearance
-      numSources
       appearances {
         useContext
-        contextSource
       }
       isVariation
       variationUF

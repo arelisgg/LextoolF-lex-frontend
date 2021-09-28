@@ -1,7 +1,26 @@
 <template>
-  <h2>Fuentes</h2>
-  <br />
-  <a-tooltip title="Agregar Fuente" placement="right">
+  <a-page-header>
+    <template #title>
+      <h2>Extracción de Unidades Fraseológicas Candidatas</h2>
+    </template>
+    <template #extra>
+      <a-tooltip
+        title="Ir a Unidades Fraseológicas Extraídas"
+        placement="bottom"
+      >
+        <a-button
+          key="documentar"
+          type="primary"
+          style="margin-right: 5px"
+          @click="goEntries"
+        >
+          UFs Extraídas
+        </a-button>
+      </a-tooltip>
+    </template>
+  </a-page-header>
+  <a-tooltip title="Nueva Unidad Fraseológica" placement="right">
+    Nueva UF
     <PlusSquareFilled
       :style="{ fontSize: '25px', color: '#08c', margin: '5px' }"
       @click="onAdd"
@@ -13,6 +32,7 @@
     :row-key="(record) => record.id"
     bordered
   >
+    <template #title>Contextos de Identificación</template>
     <template
       #filterDropdown="{
         setSelectedKeys,
@@ -62,7 +82,10 @@
         title="Seleccionar de la fuente"
         placement="bottom"
       ></a-tooltip>
-      <a-tooltip title="Seleccionar la Fuente" placement="bottom">
+      <a-tooltip
+        title="Continuar la extracción de UFs de esta Fuente"
+        placement="bottom"
+      >
         <a @click="selectSourceToWork(record.id)">
           <CarryOutFilled
             :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
@@ -165,53 +188,6 @@ export default defineComponent({
           },
         },
         {
-          title: 'URLs',
-          dataIndex: 'URL',
-          sorter: (a, b) => a.URL.localeCompare(b.URL),
-          width: 150,
-          slots: {
-            filterDropdown: 'filterDropdown',
-            filterIcon: 'filterIcon',
-          },
-          onFilter: (value, record) => {
-            return record.URL.toString()
-              .toLowerCase()
-              .includes(value.toLowerCase());
-          },
-        },
-        {
-          title: 'Tipo',
-          dataIndex: 'type',
-          sorter: (a, b) => a.type.localeCompare(b.type),
-          width: 100,
-          slots: {
-            filterDropdown: 'filterDropdown',
-            filterIcon: 'filterIcon',
-          },
-          onFilter: (value, record) => {
-            return record.type
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase());
-          },
-        },
-        {
-          title: 'Medio',
-          dataIndex: 'subType',
-          sorter: (a, b) => a.subType.localeCompare(b.subType),
-          width: 100,
-          slots: {
-            filterDropdown: 'filterDropdown',
-            filterIcon: 'filterIcon',
-          },
-          onFilter: (value, record) => {
-            return record.subType
-              .toString()
-              .toLowerCase()
-              .includes(value.toLowerCase());
-          },
-        },
-        {
           key: 'operation',
           width: 50,
           slots: { customRender: 'operation' },
@@ -227,7 +203,7 @@ export default defineComponent({
   methods: {
     onAdd() {
       this.$router.push({
-        name: 'newSourceA',
+        name: 'firstEntry',
       });
     },
     async deleteSourceByID(id) {
@@ -246,6 +222,9 @@ export default defineComponent({
     },
     closeSourceDetailsModal() {
       this.sourceDetailsModalShow = false;
+    },
+    goEntries() {
+      this.$router.push({ name: 'entries' });
     },
     async selectSourceToWork(sourceID) {
       const { data } = await Sources.getSourceByID(sourceID);

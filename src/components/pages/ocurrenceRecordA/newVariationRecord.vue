@@ -121,21 +121,6 @@
       ></a-input>
     </a-form-item>
     <a-form-item
-      ref="corpus_treasure"
-      label="CORPUS/Tesoro"
-      name="corpus_treasure"
-      :label-col="labelCol"
-      :wrapper-col="wrapperCol"
-    >
-      <a-cascader
-        :options="corpus_treasures"
-        :allow-clear="false"
-        style="width: 300px"
-        placeholder="Seleccione un CORPUS o Tesoro"
-        @change="handleOptionsChange"
-      />
-    </a-form-item>
-    <a-form-item
       ref="numAppearance"
       label="Número de Apariciones"
       name="numAppearance"
@@ -144,20 +129,6 @@
     >
       <a-input-number
         v-model:value="ocurrenceRecord.numAppearance"
-        :min="0"
-        :disabled="disabled"
-        :default-value="0"
-      />
-    </a-form-item>
-    <a-form-item
-      ref="numSources"
-      label="Número de Fuentes"
-      name="numSources"
-      :label-col="labelCol"
-      :wrapper-col="wrapperCol"
-    >
-      <a-input-number
-        v-model:value="ocurrenceRecord.numSources"
         :min="0"
         :disabled="disabled"
         :default-value="0"
@@ -266,72 +237,15 @@ export default defineComponent({
     const rules = {};
     const formRef = ref();
     const ocurrenceRecord: UnwrapRef<any> = reactive({
-      corpus_treasure: '',
+      source: '',
       variationUF: '',
       isVariation: true,
       numAppearance: 0,
-      numSources: 0,
       appearances: [],
       status: 'En Proceso',
     });
     const newAppearanceModalShow = false;
     const loading = false;
-    const corpus_treasures = [
-      {
-        value: 'CORPUS',
-        label: 'CORPUS',
-        children: [
-          {
-            value: 'Corpus del Español',
-            label: 'Corpus del Español',
-          },
-          {
-            value: 'CORPES',
-            label: 'CORPES: Corpus del Español del Siglo XXI',
-          },
-          {
-            value: 'CREA',
-            label: 'CREA: Corpus de Referencia del Español Actual',
-          },
-          {
-            value: 'CORDE',
-            label: 'CORDE: Corpus Diacrónico del Español',
-          },
-          {
-            value: 'CDH',
-            label:
-              'CDH: Corpus del Diccionario histórico de la lengua española',
-          },
-          {
-            value: 'CEMC',
-            label: 'CEMC: Corpus del Español Mexicano Contemporáneo',
-          },
-          {
-            value: 'CORDIAM',
-            label:
-              'CORDIAM: Corpus Diacrónico y Diatópico del Español de América',
-          },
-        ],
-      },
-      {
-        value: 'Tesoros',
-        label: 'Tesoros',
-        children: [
-          {
-            value: 'NTLE',
-            label: 'NTLE: Nuevo tesoro lexicográfico de la lengua española',
-          },
-          {
-            value: 'MDA',
-            label: 'MDA: Mapa de diccionarios académicos',
-          },
-          {
-            value: 'TLDEPR',
-            label: 'TLDEPR: Tesoro lexicográfico del español de Puerto Rico',
-          },
-        ],
-      },
-    ];
     return {
       loading,
       newAppearanceModalShow,
@@ -343,7 +257,6 @@ export default defineComponent({
       labelCol: { span: 7 },
       wrapperCol: { span: 14 },
       disabled: true,
-      corpus_treasures,
     };
   },
   methods: {
@@ -358,9 +271,7 @@ export default defineComponent({
     deleteAppearance(record) {
       console.log(record);
       this.ocurrenceRecord.appearances = this.ocurrenceRecord.appearances.filter(
-        (item) =>
-          record.useContext !== item.useContext ||
-          record.contextSource !== item.contextSource
+        (item) => record.useContext !== item.useContext
       );
     },
     async createOcurrenceRecord() {
@@ -385,10 +296,6 @@ export default defineComponent({
     },
     goBack() {
       this.$router.push({ name: 'documentationTask' });
-    },
-    handleOptionsChange(value) {
-      this.disabled = false;
-      this.ocurrenceRecord.corpus_treasure = value[0] + ' ' + value[1];
     },
   },
 });

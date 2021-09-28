@@ -1,7 +1,6 @@
 export class OcurrenceRecordStore {
-  corpus_treasure: String;
+  source: String;
   numAppearance: Number;
-  numSources: Number;
   appearances: [Appearence];
   isVariation: Boolean;
   variationUF: String;
@@ -10,5 +9,4 @@ export class OcurrenceRecordStore {
 
 export class Appearence {
   useContext: String;
-  contextSource: String;
 }
