@@ -103,6 +103,20 @@
       </a-tooltip>
     </template>
     <template #operation="{ record }">
+      <a-tooltip title="Detalles de la Entrada" placement="bottom">
+        <a @click="entryDetailsModalShowMethod(record)">
+          <EyeFilled
+            :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
+          />
+        </a>
+      </a-tooltip>
+      <a-tooltip title="Editar" placement="bottom">
+        <a @click="goToEditEntryA(record)">
+          <EditFilled
+            :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
+          />
+        </a>
+      </a-tooltip>
       <a-popconfirm
         v-if="entriesOfTheSource.length"
         title="Seguro de Eliminar?"
@@ -114,13 +128,6 @@
           />
         </a>
       </a-popconfirm>
-      <a-tooltip title="Detalles de la Entrada" placement="bottom">
-        <a @click="entryDetailsModalShowMethod(record)">
-          <EyeFilled
-            :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
-          />
-        </a>
-      </a-tooltip>
     </template>
   </a-table>
   <br />
@@ -138,6 +145,7 @@
 import {
   EyeFilled,
   DeleteFilled,
+  EditFilled,
   PlusSquareFilled,
 } from '@ant-design/icons-vue';
 import { defineComponent } from 'vue';
@@ -149,6 +157,7 @@ export default defineComponent({
   components: {
     PlusSquareFilled,
     DeleteFilled,
+    EditFilled,
     EyeFilled,
     EntryDetailsModal,
   },
@@ -230,6 +239,14 @@ export default defineComponent({
     },
     goSources() {
       this.$router.push({ name: 'sources' });
+    },
+    goToEditEntryA(selectedEntry) {
+      this.$router.push({
+        name: 'editEntryA',
+        params: {
+          id: selectedEntry.id,
+        },
+      });
     },
   },
 });

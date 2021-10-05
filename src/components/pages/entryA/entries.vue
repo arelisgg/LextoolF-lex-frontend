@@ -82,6 +82,13 @@
           />
         </a>
       </a-tooltip>
+      <a-tooltip title="Editar" placement="bottom">
+        <a @click="goToEditEntryA(record)">
+          <EditFilled
+            :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
+          />
+        </a>
+      </a-tooltip>
       <a-popconfirm
         v-if="entries.length"
         title="Seguro de Eliminar?"
@@ -212,6 +219,14 @@ export default defineComponent({
     },
     closeEntryDetailsModal() {
       this.entryDetailsModalShow = false;
+    },
+    goToEditEntryA(selectedEntry) {
+      this.$router.push({
+        name: 'editEntryA',
+        params: {
+          id: selectedEntry.id,
+        },
+      });
     },
   },
 });

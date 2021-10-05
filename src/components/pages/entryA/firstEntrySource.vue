@@ -3,7 +3,7 @@
     <a-steps :current="current">
       <a-step v-for="item in steps" :key="item.title" :title="item.title" />
     </a-steps>
-    <!-- Step 2 -->
+    <!-- Step 1 -->
     <div v-show="steps[current].title === 'Nueva UF'" class="steps-content">
       <h4>Nueva Unidad Fraseológica Candidata</h4>
       <br />
@@ -15,7 +15,10 @@
           :label-col="labelCol"
           :wrapper-col="wrapperCol"
         >
-          <a-input v-model:value="entryA.UF"></a-input>
+          <a-input
+            v-model:value="entryA.UF"
+            :style="{ width: '350px' }"
+          ></a-input>
         </a-form-item>
         <a-form-item
           ref="tipoOrigen"
@@ -27,7 +30,6 @@
             v-model="value"
             :default-value="1"
             button-style="solid"
-            :disabled="disabledRadio"
             @change="radioSelect"
           >
             <a-radio-button :value="1">Imagen</a-radio-button>
@@ -140,7 +142,7 @@
       <div>
         <a-tabs default-active-key="1" @change="callback">
           <a-tab-pane key="1" tab="General">
-            <a-form ref="formRef" :model="source" :rules="rules">
+            <a-form ref="formRefS" :model="source" :rules="rules">
               <a-form-item
                 ref="name"
                 label="Nombre de la Fuente"
@@ -151,6 +153,7 @@
                 <a-input
                   v-model:value="source.name"
                   placeholde="Nombre de la Fuente"
+                  :style="{ width: '350px' }"
                 ></a-input>
               </a-form-item>
               <a-form-item
@@ -163,6 +166,7 @@
                 <a-textarea
                   v-model:value="source.ref"
                   placeholder="Referencia de la Fuente"
+                  :style="{ width: '350px' }"
                   allow-clear
                 />
               </a-form-item>
@@ -178,6 +182,7 @@
                   :options="options"
                   :default-value="['Linguística', 'Oral', 'Audio']"
                   placeholder="Seleccione una Tipo"
+                  :style="{ width: '350px' }"
                   @change="handleOptionsChange"
                 />
                 <a-cascader
@@ -191,6 +196,7 @@
                   v-else
                   :options="options"
                   placeholder="Seleccione una Tipo"
+                  :style="{ width: '350px' }"
                   @change="handleOptionsChange"
                 />
               </a-form-item>
@@ -204,6 +210,7 @@
                 <a-input
                   v-model:value="source.URL"
                   placeholde="URL de la Fuente"
+                  :style="{ width: '350px' }"
                 ></a-input>
               </a-form-item>
             </a-form>
@@ -211,10 +218,11 @@
           <a-tab-pane key="2" tab="Especificaciones" force-render>
             <a-form :model="source">
               <div v-show="source.type === ''">
-                <h4>
-                  Debe seleccionar un tipo de fuente para poder especificar
-                  otros datos
-                </h4>
+                <a-alert
+                  message="Debe seleccionar un tipo de fuente para poder especificar otros datos"
+                  type="info"
+                  show-icon
+                />
               </div>
               <div v-show="source.type === 'Metalinguística'">
                 <a-form-item
@@ -224,14 +232,30 @@
                   :label-col="labelColModal"
                   :wrapper-col="wrapperColModal"
                 >
-                  <a-select v-model:value="source.dictionaryType">
-                    <a-select-option
-                      v-for="dictionaryType in dictionariesTypes"
-                      :key="dictionaryType"
+                  <a-space direction="horizontal" align="center">
+                    <a-select
+                      v-model:value="source.dictionaryType"
+                      :style="{ width: '350px' }"
+                      @change="dictionaryTypeSelected"
                     >
-                      {{ dictionaryType }}
-                    </a-select-option>
-                  </a-select>
+                      <a-select-option
+                        v-for="dictionaryType in dictionariesTypes"
+                        :key="dictionaryType.id"
+                      >
+                        {{ dictionaryType.nombre }}
+                      </a-select-option>
+                    </a-select>
+                    <a-tooltip
+                      title="Añadir Tipo de Diccionario"
+                      placement="bottom"
+                    >
+                      <PlusOutlined
+                        class="dynamic-add-button"
+                        :style="{ color: '#1890ff' }"
+                        @click="showModalD"
+                      />
+                    </a-tooltip>
+                  </a-space>
                 </a-form-item>
                 <a-form-item
                   ref="century"
@@ -243,6 +267,7 @@
                   <a-input
                     v-model:value="source.century"
                     placeholde="Siglo"
+                    :style="{ width: '350px' }"
                   ></a-input>
                 </a-form-item>
                 <div
@@ -261,6 +286,7 @@
                     <a-input
                       v-model:value="source.library_name"
                       placeholde="Nombre de la biblioteca Virtual"
+                      :style="{ width: '350px' }"
                     ></a-input>
                   </a-form-item>
                   <a-form-item
@@ -273,6 +299,7 @@
                     <a-input
                       v-model:value="source.url_location"
                       placeholde="Localización URL"
+                      :style="{ width: '350px' }"
                     ></a-input>
                   </a-form-item>
                 </div>
@@ -286,7 +313,8 @@
                   :wrapper-col="wrapperColModal"
                 >
                   <a-select
-                    v-model:value="source.bloque"
+                    :default-value="bloques[0]"
+                    :style="{ width: '350px' }"
                     @change="handleBloqueChange"
                   >
                     <a-select-option v-for="bloque in bloques" :key="bloque">
@@ -301,11 +329,50 @@
                   :label-col="labelColModal"
                   :wrapper-col="wrapperColModal"
                 >
-                  <a-select v-model:value="source.theme">
-                    <a-select-option v-for="tema in temas" :key="tema">
-                      {{ tema }}
-                    </a-select-option>
-                  </a-select>
+                  <a-space direction="horizontal" align="center">
+                    <a-select
+                      v-if="bloqueSelected === 'NoFicción'"
+                      :style="{ width: '350px' }"
+                      placeholder="Seleccione un Tema"
+                      @change="themeSelected"
+                    >
+                      <a-select-option v-for="t in themes" :key="t.nombre">
+                        {{ t.nombre }}
+                      </a-select-option>
+                    </a-select>
+                    <a-tooltip title="Añadir Tema" placement="bottom">
+                      <PlusOutlined
+                        v-if="bloqueSelected === 'NoFicción'"
+                        class="dynamic-add-button"
+                        :style="{ color: '#1890ff' }"
+                        @click="showModalT"
+                      />
+                    </a-tooltip>
+                  </a-space>
+                  <a-space
+                    direction="horizontal"
+                    align="center"
+                    :style="{ padding: '0px' }"
+                  >
+                    <a-select
+                      v-if="bloqueSelected === 'Ficción'"
+                      :style="{ width: '350px' }"
+                      placeholder="Seleccione un Género"
+                      @change="themeSelected"
+                    >
+                      <a-select-option v-for="g in genres" :key="g.nombre">
+                        {{ g.nombre }}
+                      </a-select-option>
+                    </a-select>
+                    <a-tooltip title="Añadir Género" placement="bottom">
+                      <PlusOutlined
+                        v-if="bloqueSelected === 'Ficción'"
+                        class="dynamic-add-button"
+                        :style="{ color: '#1890ff' }"
+                        @click="showModalG"
+                      />
+                    </a-tooltip>
+                  </a-space>
                 </a-form-item>
                 <a-form-item
                   v-show="source.support === 'Publicación Periódica'"
@@ -315,11 +382,29 @@
                   :label-col="labelColModal"
                   :wrapper-col="wrapperColModal"
                 >
-                  <a-select v-model:value="source.session_p">
-                    <a-select-option v-for="sp in session_p" :key="sp">
-                      {{ sp }}
-                    </a-select-option>
-                  </a-select>
+                  <a-space direction="horizontal" align="center">
+                    <a-select
+                      :style="{ width: '350px' }"
+                      @change="sessionSelected"
+                    >
+                      <a-select-option
+                        v-for="sp in sessions_p"
+                        :key="sp.nombre"
+                      >
+                        {{ sp.nombre }}
+                      </a-select-option>
+                    </a-select>
+                    <a-tooltip
+                      title="Añadir Sección de Periódico"
+                      placement="bottom"
+                    >
+                      <PlusOutlined
+                        class="dynamic-add-button"
+                        :style="{ color: '#1890ff' }"
+                        @click="showModalS"
+                      />
+                    </a-tooltip>
+                  </a-space>
                 </a-form-item>
                 <a-form-item
                   v-show="source.support === 'Publicación Periódica'"
@@ -329,7 +414,10 @@
                   :label-col="labelColModal"
                   :wrapper-col="wrapperColModal"
                 >
-                  <a-select v-model:value="source.magazine_type_p">
+                  <a-select
+                    v-model:value="source.magazine_type_p"
+                    :style="{ width: '350px' }"
+                  >
                     <a-select-option v-for="mtp in magazine_type_p" :key="mtp">
                       {{ mtp }}
                     </a-select-option>
@@ -350,6 +438,7 @@
                 >
                   <a-textarea
                     v-model:value="source.speaker"
+                    :style="{ width: '350px' }"
                     placeholder="Tenga en cuenta los datos nombre, sexo, grupo etario, nivel educacional, profesión, ciudad de origen, provincia."
                     allow-clear
                   />
@@ -361,14 +450,26 @@
                   :label-col="labelColModal"
                   :wrapper-col="wrapperColModal"
                 >
-                  <a-select v-model:value="source.typology">
-                    <a-select-option
-                      v-for="typology in typologies"
-                      :key="typology"
+                  <a-space direction="horizontal" align="center">
+                    <a-select
+                      :style="{ width: '350px' }"
+                      @change="typologySelected"
                     >
-                      {{ typology }}
-                    </a-select-option>
-                  </a-select>
+                      <a-select-option
+                        v-for="typology in typologies"
+                        :key="typology.nombre"
+                      >
+                        {{ typology.nombre }}
+                      </a-select-option>
+                    </a-select>
+                    <a-tooltip title="Añadir Tipología" placement="bottom">
+                      <PlusOutlined
+                        class="dynamic-add-button"
+                        :style="{ color: '#1890ff' }"
+                        @click="showModalTY"
+                      />
+                    </a-tooltip>
+                  </a-space>
                 </a-form-item>
                 <a-form-item
                   ref="broadcastMedium"
@@ -377,7 +478,10 @@
                   :label-col="labelColModal"
                   :wrapper-col="wrapperColModal"
                 >
-                  <a-select v-model:value="source.broadcastMedium">
+                  <a-select
+                    v-model:value="source.broadcastMedium"
+                    :style="{ width: '350px' }"
+                  >
                     <a-select-option
                       v-for="broadcastMedium in broadcastMediums"
                       :key="broadcastMedium"
@@ -435,7 +539,9 @@
       </div>
     </div>
     <div class="steps-action" style="text-align: right">
-      <a-button v-if="current < steps.length - 1" @click="next">Next</a-button>
+      <a-button v-if="current < steps.length - 1" @click="next">
+        Siguiente
+      </a-button>
       <a-button
         v-if="current == steps.length - 1"
         key="submit"
@@ -450,16 +556,48 @@
         Cancelar
       </a-button>
       <a-button v-if="current > 0" style="margin-left: 8px" @click="prev">
-        Previous
+        Anterior
       </a-button>
     </div>
   </div>
+  <add-theme-modal
+    v-model:visible="addThemeModalShow"
+    @close-modal="showModalT"
+    @add-theme="addTheme"
+  ></add-theme-modal>
+  <add-genre-modal
+    v-model:visible="addGenreModalShow"
+    @close-modal="showModalG"
+    @add-genres="addGenres"
+  ></add-genre-modal>
+  <add-typology-modal
+    v-model:visible="addTypologyModalShow"
+    @close-modal="showModalTY"
+    @add-typology="addTypology"
+  ></add-typology-modal>
+  <add-dictionary-type-modal
+    v-model:visible="addDictionaryTypeModalShow"
+    @close-modal="showModalD"
+    @add-dictionary-type="addDictionaryType"
+  ></add-dictionary-type-modal>
+  <add-session-modal
+    v-model:visible="addSessionModalShow"
+    @close-modal="showModalS"
+    @add-session="addSession"
+  ></add-session-modal>
 </template>
 <script lang="ts">
 import 'ant-design-vue/lib/upload/style';
 import moment from 'moment';
 
 import CroppieModal from './VueCroppie/CroppieModal.vue';
+
+import AddThemeModal from './Nomenclators/addThemeModal.vue';
+import AddGenreModal from './Nomenclators/addGenreModal.vue';
+import AddSessionModal from './Nomenclators/addSessionModal.vue';
+import AddDictionaryTypeModal from './Nomenclators/addDictionaryTypeModal.vue';
+import AddTypologyModal from './Nomenclators/addTypologyModal.vue';
+
 import { defineComponent, ref } from 'vue';
 import {
   InboxOutlined,
@@ -475,6 +613,7 @@ import {
 } from '@ant-design/icons-vue';
 import { EntryA } from '@/graphql/modules/entryA/model';
 import { Sources } from '@/graphql/modules/sourcesA/model.ts';
+import { Nomenclator } from '@/graphql/modules/nomenclator/model.ts';
 
 import { axiosClientPostImage } from '@/plugins/axios';
 
@@ -491,6 +630,11 @@ export default defineComponent({
     DeleteFilled,
     InboxOutlined,
     'croppie-modal': CroppieModal,
+    'add-theme-modal': AddThemeModal,
+    'add-genre-modal': AddGenreModal,
+    'add-dictionary-type-modal': AddDictionaryTypeModal,
+    'add-typology-modal': AddTypologyModal,
+    'add-session-modal': AddSessionModal,
   },
   data() {
     const rules = {
@@ -585,66 +729,14 @@ export default defineComponent({
       },
     ];
     const bloques = ['Ficción', 'NoFicción'];
-    const theme = {
-      Ficción: ['Novela', 'Relato', 'Teatro'],
-      NoFicción: [
-        'Ocio y vida cotidiana',
-        'Artes y cultura',
-        'Ciencias sociales, creencias y pensamiento',
-        'Ciencias exactas, tecnología y Salud',
-        'Política, economía y justicia',
-      ],
-    };
-    const broadcastMediums = ['Cadena de radio', 'Cadena de TV', 'Internet'];
-    const session_p = [
-      'Nacionales',
-      'Internacionales',
-      'Culturales',
-      'Deportes',
-      'Economía',
-      'Otra',
-    ];
     const magazine_type_p = ['Especializada', 'No especializada'];
-    const typologies = [
-      'Conversación',
-      'Debate',
-      'Discurso',
-      'Entrevista',
-      'Entrevista semidirigida',
-      'Magacines y variedades',
-      'Noticia',
-      'Publicidad',
-      'Reportajes y documentales',
-      'Retransmisiones deportivas',
-      'Sorteos y concursos',
-      'Tertulia',
-      'Otros',
-    ];
-    const dictionariesTypes = [
-      'Normativo',
-      'De uso práctico',
-      'Monolingües',
-      'Bilingües',
-      'De aprendizaje',
-      'Etimológicos',
-      'De sinónimos y antónimos',
-      'Especializado',
-      'Inverso o de rimas',
-      'De gramática',
-      'De dudas',
-      'Tesauro',
-      'Ideológico o de ideas afines',
-      'Diccionario analógico conceptual',
-      'Visual o de imágenes',
-      'Enciclopédico',
-    ];
     const source = {
       name: '',
       ref: '',
-      file: '',
       type: '',
       subType: '',
       support: '',
+      stage: '',
 
       // linguisticas libro o prensa
       bloque: '',
@@ -670,6 +762,7 @@ export default defineComponent({
       library_name: '',
       url_location: '',
     };
+    const broadcastMediums = ['Cadena de radio', 'Cadena de TV', 'Internet'];
     const formItemLayoutWithOutLabelModal = {
       wrapperCol: {
         xs: { span: 24, offset: 0 },
@@ -677,6 +770,7 @@ export default defineComponent({
       },
     };
     const formRef = ref();
+    const formRefS = ref();
     const loading = false;
     const entryA = {
       UF: '',
@@ -686,23 +780,33 @@ export default defineComponent({
       context: '',
       selected: false,
     };
+    const addGenreModalShow = false;
+    const addThemeModalShow = false;
+    const addDictionaryTypeModalShow = false;
+    const addTypologyModalShow = false;
+    const addSessionModalShow = false;
     return {
       // fuente ******
+      addGenreModalShow,
+      addThemeModalShow,
+      addDictionaryTypeModalShow,
+      addTypologyModalShow,
+      addSessionModalShow,
+      bloqueSelected: 'Ficción',
+      themes: [],
+      typologies: [],
+      dictionariesTypes: [],
+      genres: [],
+      sessions_p: [],
       options,
       bloques,
-      theme,
-      session_p,
+      formRefS,
       magazine_type_p,
-      temas: theme[bloques[0]],
-      secondTema: theme[bloques[0]][0],
       broadcastMediums,
-      typologies,
-      dictionariesTypes,
       formItemLayoutWithOutLabelModal,
       source,
       labelColModal: { span: 8 },
       wrapperColModal: { span: 14 },
-      file: null,
       // entry *******
       loading,
       entryA,
@@ -736,6 +840,23 @@ export default defineComponent({
       ],
     };
   },
+  async mounted() {
+    const t = await Nomenclator.getAllThemes();
+    this.themes = t.data.getAllThemes;
+    console.log('themes', this.themes);
+    const ty = await Nomenclator.getAllTypologies();
+    this.typologies = ty.data.getAllTypologies;
+    console.log('typologies', this.typologies);
+    const dt = await Nomenclator.getAllDictionaryTypes();
+    this.dictionariesTypes = dt.data.getAllDictionaryTypes;
+    console.log('dictionariesTypes', this.dictionariesTypes);
+    const g = await Nomenclator.getAllGenres();
+    this.genres = g.data.getAllGenres;
+    console.log('genres', this.genres);
+    const sp = await Nomenclator.getAllSessionsP();
+    this.sessions_p = sp.data.getAllSessionsP;
+    console.log('sessions_p', this.sessions_p);
+  },
   methods: {
     async submit() {
       if (this.selectedFile) {
@@ -751,6 +872,7 @@ export default defineComponent({
       if (this.image.file !== null) {
         this.uploadFileImage();
       }
+      this.source.stage = 'Extracción';
       const s = await this.createSource();
       const sourceID = s.data.createSource.id;
       this.createEntryA(sourceID);
@@ -926,10 +1048,51 @@ export default defineComponent({
       }
     },
     goBack() {
-      this.$router.push({ name: 'extractionTask' });
+      this.$router.push({ name: 'sources' });
     },
 
     // fuente******
+
+    showModalT() {
+      this.addThemeModalShow = !this.addThemeModalShow;
+    },
+    showModalG() {
+      this.addGenreModalShow = !this.addGenreModalShow;
+    },
+    showModalTY() {
+      this.addTypologyModalShow = !this.addTypologyModalShow;
+    },
+    showModalS() {
+      this.addSessionModalShow = !this.addSessionModalShow;
+    },
+    showModalD() {
+      this.addDictionaryTypeModalShow = !this.addDictionaryTypeModalShow;
+    },
+    async addTheme(newTheme) {
+      this.themes.push(newTheme);
+      await Nomenclator.addTheme(newTheme);
+      this.showModalT();
+    },
+    async addGenres(newGenre) {
+      this.genres.push(newGenre);
+      await Nomenclator.addGenres(newGenre);
+      this.showModalG();
+    },
+    async addTypology(newTypology) {
+      this.typologies.push(newTypology);
+      await Nomenclator.addTypology(newTypology);
+      this.showModalTY();
+    },
+    async addSession(newSession) {
+      this.sessions_p.push(newSession);
+      await Nomenclator.addSessionP(newSession);
+      this.showModalS();
+    },
+    async addDictionaryType(newDictionaryType) {
+      this.dictionariesTypes.push(newDictionaryType);
+      await Nomenclator.addDictionaryType(newDictionaryType);
+      this.showModalD();
+    },
     moment,
     setCantMin(time) {
       let t = new Date(time);
@@ -957,8 +1120,24 @@ export default defineComponent({
       console.log('date', fecha);
     },
     handleBloqueChange(value) {
-      this.temas = this.theme[value];
-      this.secondTema = this.theme[value][0];
+      this.bloqueSelected = value;
+      this.source.bloque = value;
+    },
+    typologySelected(value) {
+      console.log('value', value);
+      this.source.typology = value.nombre;
+    },
+    themeSelected(value) {
+      console.log('value', value);
+      this.source.theme = value.nombre;
+    },
+    sessionSelected(value) {
+      console.log('value', value);
+      this.source.session_p = value.nombre;
+    },
+    dictionaryTypeSelected(value) {
+      console.log('value', value);
+      this.source.dictionaryType = value.nombre;
     },
     callback(key) {
       console.log(key);

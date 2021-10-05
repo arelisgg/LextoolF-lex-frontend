@@ -10,14 +10,6 @@
       <a-form-item :colon="false">
         <template #label>
           <span style="font-weight: 700">
-            Fuente:
-            <span style="font-weight: 500">{{ selectedEntry.source }}</span>
-          </span>
-        </template>
-      </a-form-item>
-      <a-form-item :colon="false">
-        <template #label>
-          <span style="font-weight: 700">
             Unidad Fraseológica:
             <span style="font-weight: 500">{{ selectedEntry.UF }}</span>
           </span>
@@ -25,23 +17,27 @@
       </a-form-item>
       <div style="padding: 2px">
         <video
-          :src="MINIO_URL_A + '/' + selectedEntry.context"
           v-show="
             selectedEntry.context.split('_')[0] === 'Video' ||
             fileType === 'Video'
           "
+          :src="MINIO_URL_A + '/' + selectedEntry.context"
           width="320"
           height="240"
           controls
         ></video>
         <audio
-          :src="MINIO_URL_A + '/' + selectedEntry.context"
           v-show="
             selectedEntry.context.split('_')[0] === 'Audio' ||
             fileType === 'Audio'
           "
+          :src="MINIO_URL_A + '/' + selectedEntry.context"
           controls
         ></audio>
+        <img
+          v-show="selectedEntry.context.split('_')[0] === 'Imagen'"
+          :src="MINIO_URL_A + '/' + selectedEntry.context"
+        />
       </div>
     </a-form>
   </a-modal>

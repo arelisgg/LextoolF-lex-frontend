@@ -1,7 +1,7 @@
 <template>
   <h4>Nueva Unidad Fraseológica Candidata</h4>
   <br />
-  <a-form ref="formRef" :model="entryA" :rules="rules">
+  <a-form ref="formRef" :model="entryToEdit" :rules="rules">
     <a-form-item
       ref="UF"
       label="Unidad Fraseológica"
@@ -9,32 +9,60 @@
       :label-col="labelCol"
       :wrapper-col="wrapperCol"
     >
-      <a-input v-model:value="entryA.UF"></a-input>
+      <a-input v-model:value="entryToEdit.UF"></a-input>
     </a-form-item>
     <div v-show="selectedSource.subType === 'Escrita'">
       <croppie-modal @crop="crop"></croppie-modal>
-      <a-form-item
-        v-if="image !== null && showPreviewImage"
-        ref="context"
-        label="Contexto"
-        name="context"
-        :label-col="labelCol"
-        :wrapper-col="wrapperCol"
-      >
-        <img v-show="image !== null && showPreviewImage" :src="image.base64" />
-      </a-form-item>
-      <a-form-item
-        v-else
-        label="Info"
-        :label-col="labelCol"
-        :wrapper-col="wrapperCol"
-      >
-        <a-alert
-          message='Click en cualquier parte de la ventana y luego "CTRL + V" para pegar la Imagen'
-          type="info"
-          show-icon
-        />
-      </a-form-item>
+      <div v-if="editImageFile">
+        <a-form-item
+          v-if="showPreviewImage"
+          ref="context"
+          label="Contexto"
+          name="context"
+          :label-col="labelCol"
+          :wrapper-col="wrapperCol"
+        >
+          <a-space direction="vertical">
+            <img v-show="showPreviewImage" :src="image.base64" />
+            <a-button type="primary" @click="editImageFileChange">
+              Atrás
+            </a-button>
+          </a-space>
+        </a-form-item>
+        <a-form-item
+          v-else
+          label="Info"
+          :label-col="labelCol"
+          :wrapper-col="wrapperCol"
+        >
+          <a-space direction="vertical">
+            <a-alert
+              message='Click en cualquier parte de la ventana y luego "CTRL + V" para pegar la Imagen'
+              type="info"
+              show-icon
+            />
+            <a-button type="primary" @click="editImageFileChange">
+              Atrás
+            </a-button>
+          </a-space>
+        </a-form-item>
+      </div>
+      <div v-if="!editImageFile">
+        <a-form-item
+          ref="context"
+          label="Contexto"
+          name="context"
+          :label-col="labelCol"
+          :wrapper-col="wrapperCol"
+        >
+          <a-space direction="vertical">
+            <img :src="MINIO_URL_A + '/' + entryToEdit.context" />
+            <a-button type="primary" @click="editImageFileChange">
+              Cambiar Foto
+            </a-button>
+          </a-space>
+        </a-form-item>
+      </div>
     </div>
     <div v-show="selectedSource.support === 'Video'">
       <a-form-item
@@ -44,30 +72,50 @@
         :label-col="labelCol"
         :wrapper-col="wrapperCol"
       >
-        <input
-          ref="fileInput"
-          type="file"
-          name="file"
-          style="display: none"
-          accept="video/mp4,video/x-m4v,video/*"
-          @change="onFileSelectedV"
-        />
-        <a-button type="primary" @click="$refs.fileInput.click()">
-          Seleccione el Video
-        </a-button>
-        <br />
-        <span v-if="!selectedFile" class="file-info">
-          Ningún archivo seleccionado
-        </span>
-        <span v-else class="file-info">{{ selectedFile.name }}</span>
-        <br />
-        <video
-          v-show="showPreview"
-          :src="videoPreview"
-          width="320"
-          height="240"
-          controls
-        ></video>
+        <div v-if="!editFile">
+          <a-space direction="horizontal" align="center">
+            >
+            <video
+              :src="MINIO_URL_A + '/' + entryToEdit.context"
+              width="320"
+              height="240"
+              controls
+            ></video>
+            <a-button type="primary" @click="editFileChange">
+              Subir otro Video
+            </a-button>
+          </a-space>
+        </div>
+        <div v-if="editFile">
+          <input
+            ref="fileInput"
+            type="file"
+            name="file"
+            style="display: none"
+            accept="video/mp4,video/x-m4v,video/*"
+            @change="onFileSelectedV"
+          />
+          <a-space direction="horizontal" align="center">
+            >
+            <a-button type="primary" @click="$refs.fileInput.click()">
+              Seleccione el Video
+            </a-button>
+            <a-button type="primary" @click="editFileChange">Atrás</a-button>
+          </a-space>
+          <br />
+          <span v-if="!selectedFile" class="file-info">
+            Ningún archivo seleccionado
+          </span>
+          <span v-else class="file-info">{{ selectedFile.name }}</span>
+          <br />
+          <video
+            v-show="showPreview"
+            :src="videoPreview"
+            width="320"
+            height="240"
+            controls
+          ></video>
+        </div>
       </a-form-item>
     </div>
     <div v-show="selectedSource.support === 'Audio'">
@@ -78,24 +126,41 @@
         :label-col="labelCol"
         :wrapper-col="wrapperCol"
       >
-        <input
-          ref="fileInputA"
-          type="file"
-          name="file"
-          style="display: none"
-          accept="audio/*"
-          @change="onFileSelectedA"
-        />
-        <a-button type="primary" @click="$refs.fileInputA.click()">
-          Seleccione el Audio
-        </a-button>
-        <br />
-        <span v-if="!selectedFile" class="file-info">
-          Ningún archivo seleccionado
-        </span>
-        <span v-else class="file-info">{{ selectedFile.name }}</span>
-        <br />
-        <audio v-show="showPreviewAudio" :src="audioPreview" controls></audio>
+        <div v-if="editFile === false">
+          <a-space direction="horizontal" align="center">
+            <audio
+              :src="MINIO_URL_A + '/' + entryToEdit.context"
+              controls
+            ></audio>
+            <br />
+            <a-button type="primary" @click="editFileChange">
+              Subir otro Audio
+            </a-button>
+          </a-space>
+        </div>
+        <div v-if="editFile">
+          <input
+            ref="fileInputA"
+            type="file"
+            name="file"
+            style="display: none"
+            accept="audio/*"
+            @change="onFileSelectedA"
+          />
+          <a-space direction="horizontal" align="center">
+            <a-button type="primary" @click="$refs.fileInputA.click()">
+              Seleccione el Audio
+            </a-button>
+            <a-button type="primary" @click="editFileChange">Atrás</a-button>
+          </a-space>
+          <br />
+          <span v-if="!selectedFile" class="file-info">
+            Ningún archivo seleccionado
+          </span>
+          <span v-else class="file-info">{{ selectedFile.name }}</span>
+          <br />
+          <audio v-show="showPreviewAudio" :src="audioPreview" controls></audio>
+        </div>
       </a-form-item>
     </div>
     <div style="text-align: right">
@@ -104,7 +169,7 @@
         type="primary"
         :loading="loading"
         style="margin-left: 5px"
-        @click="submit"
+        @click="editEntry"
       >
         Crear
       </a-button>
@@ -126,6 +191,7 @@ import {
   DeleteFilled,
 } from '@ant-design/icons-vue';
 import { EntryA } from '@/graphql/modules/entryA/model';
+import { MINIO_URL_A as minio_url } from '@/utils/minIO.ts';
 import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 
 import CroppieModal from './VueCroppie/CroppieModal.vue';
@@ -144,6 +210,12 @@ export default defineComponent({
     DeleteFilled,
     'croppie-modal': CroppieModal,
   },
+  setup() {
+    const MINIO_URL_A = minio_url;
+    return {
+      MINIO_URL_A,
+    };
+  },
   data() {
     const rules = {
       UF: [
@@ -156,7 +228,7 @@ export default defineComponent({
     };
     const formRef = ref();
     const loading = false;
-    const entryA = {
+    const entryToEdit = {
       UF: '',
       lemma: '',
       source: '',
@@ -170,7 +242,7 @@ export default defineComponent({
         file: null,
       },
       loading,
-      entryA,
+      entryToEdit,
       formRef,
       rules,
       selectedFile: null,
@@ -186,16 +258,25 @@ export default defineComponent({
       uploadProgressAudio: 0,
       uploadProgressImage: 0,
       selectedSource: {},
+      editFile: false,
+      editImageFile: false,
     };
   },
   async mounted() {
-    const sID = this.$route.params.source.toString();
+    const id = this.$route.params.id.toString();
+    const { data } = await EntryA.getEntryByID(id);
+    this.entryToEdit = data.getEntryByID;
+    console.log('this.entryToEdit', this.entryToEdit);
+    console.log('this.editFile', this.editFile);
+
+    const sID = this.entryToEdit.source;
     const s = await Sources.getSourceByID(sID);
     this.selectedSource = s.data.getSourceByID;
   },
   methods: {
-    async submit() {
-      if (this.selectedFile) {
+    editEntry() {
+      console.log('this.entryToEdit', this.entryToEdit);
+      if (this.selectedFile || this.editFile) {
         if (/\.(mp4|avi|x-m4v)$/i.test(this.selectedFile.name)) {
           this.uploadFileVideo();
         }
@@ -205,16 +286,14 @@ export default defineComponent({
           this.uploadFileAudio();
         }
       }
-      if (this.image.file !== null) {
+      if (this.image.file !== null || this.editImageFile) {
         this.uploadFileImage();
       }
-      this.createEntryA();
-      this.$router.push({ name: 'extractionTask' });
-    },
-    createEntryA() {
       this.loading = true;
-      this.entryA.source = this.selectedSource.id;
-      EntryA.createEntry(this.entryA);
+      this.entryToEdit.source = this.selectedSource.id;
+      EntryA.updateEntryByID(this.entryToEdit);
+      console.log('this.entryToEdit', this.entryToEdit);
+      this.$router.push({ name: 'entries' });
     },
     //file Videos
     onFileSelectedV(event) {
@@ -241,8 +320,8 @@ export default defineComponent({
         const element = this.selectedFile;
         const extensionFile = '.' + element.name.split('.')[1];
         const date = Date.now();
-        this.entryA.context = 'Video_context_' + date + extensionFile;
-        console.log('file name', this.entryA.context);
+        this.entryToEdit.context = 'Video_context_' + date + extensionFile;
+        console.log('file name', this.entryToEdit.context);
 
         const config = {
           onUploadProgress: function (progressEvent) {
@@ -257,7 +336,7 @@ export default defineComponent({
         console.log(this.selectedFile);
         formData.append('file', this.selectedFile);
         axiosClientPostImage
-          .post(`/${this.entryA.context}`, formData, config)
+          .post(`/${this.entryToEdit.context}`, formData, config)
           .then(function () {
             console.log('SUCCESS!!');
           })
@@ -279,8 +358,8 @@ export default defineComponent({
       const element = fileImage.file;
       const extensionFile = '.' + element.name.split('.')[1];
       const date = Date.now();
-      this.entryA.context = 'Image_context_' + date + extensionFile;
-      console.log('file name', this.entryA.context);
+      this.entryToEdit.context = 'Image_context_' + date + extensionFile;
+      console.log('file name', this.entryToEdit.context);
 
       const config = {
         onUploadProgress: function (progressEvent) {
@@ -294,7 +373,7 @@ export default defineComponent({
       const formData = new FormData();
       formData.append('file', fileImage.file);
       axiosClientPostImage
-        .post(`/${this.entryA.context}`, formData, config)
+        .post(`/${this.entryToEdit.context}`, formData, config)
         .then(function () {
           console.log('SUCCESS!!');
         })
@@ -329,8 +408,8 @@ export default defineComponent({
         const element = this.selectedFile;
         const extensionFile = '.' + element.name.split('.')[1];
         const date = Date.now();
-        this.entryA.context = 'Audio_context_' + date + extensionFile;
-        console.log('file name', this.entryA.context);
+        this.entryToEdit.context = 'Audio_context_' + date + extensionFile;
+        console.log('file name', this.entryToEdit.context);
 
         const config = {
           onUploadProgress: function (progressEvent) {
@@ -345,7 +424,7 @@ export default defineComponent({
         console.log(this.selectedFile);
         formData.append('file', this.selectedFile);
         axiosClientPostImage
-          .post(`/${this.entryA.context}`, formData, config)
+          .post(`/${this.entryToEdit.context}`, formData, config)
           .then(function () {
             console.log('SUCCESS!!');
           })
@@ -355,7 +434,15 @@ export default defineComponent({
       }
     },
     goBack() {
-      this.$router.push({ name: 'extractionTask' });
+      this.$router.push({ name: 'entries' });
+    },
+    editFileChange() {
+      this.editFile = !this.editFile;
+      console.log('this.editFile', this.editFile);
+    },
+    editImageFileChange() {
+      this.editImageFile = !this.editImageFile;
+      console.log('this.editImageFile', this.editImageFile);
     },
   },
 });
