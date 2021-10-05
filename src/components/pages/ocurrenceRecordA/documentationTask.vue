@@ -41,9 +41,11 @@
       <a-tabs default-active-key="1" @change="callback">
         <a-tab-pane key="1" tab="Registro de Ocurrencias">
           <div v-show="entrySelected.UF === ''">
-            <h4 style="padding: 50px">
-              Seleccione una Unidad Fraseológica Candidata en el menú lateral
-            </h4>
+            <a-alert
+              message="Seleccione una Unidad Fraseológica Candidata en el menú lateral"
+              type="info"
+              show-icon
+            />
           </div>
           <div v-show="entrySelected.UF !== ''">
             <a-table
@@ -89,7 +91,7 @@
                   title="Editar del estudio fraseologico"
                   placement="bottom"
                 >
-                  <a v-if="record.status === 'En Proceso'">
+                  <a>
                     <EditFilled
                       :style="{
                         fontSize: '20px',
@@ -116,9 +118,11 @@
         </a-tab-pane>
         <a-tab-pane key="2" tab="Registro de Variación" force-render>
           <div v-show="entrySelected.UF === ''">
-            <h4 style="padding: 50px">
-              Seleccione una Unidad Fraseológica Candidata en el menu lateral
-            </h4>
+            <a-alert
+              message="Seleccione una Unidad Fraseológica Candidata en el menú lateral"
+              type="info"
+              show-icon
+            />
           </div>
           <div v-show="entrySelected.UF !== ''">
             <a-table
@@ -147,7 +151,7 @@
                   title="Editar del estudio fraseologico"
                   placement="bottom"
                 >
-                  <a v-if="record.status === 'En Proceso'">
+                  <a>
                     <EditFilled
                       :style="{
                         fontSize: '20px',
@@ -239,23 +243,6 @@ export default defineComponent({
         slots: { customRender: 'numAppearance' },
       },
       {
-        title: 'Estado',
-        dataIndex: 'status',
-        key: 'status',
-        width: 100,
-        sorter: (a, b) => a.name.localeCompare(b.name),
-        slots: {
-          filterDropdown: 'filterDropdown',
-          filterIcon: 'filterIcon',
-        },
-        onFilter: (value, record) => {
-          return record.status
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        },
-      },
-      {
         title: '',
         key: 'operation',
         width: 50,
@@ -275,31 +262,6 @@ export default defineComponent({
         },
         onFilter: (value, record) => {
           return record.variationUF
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        },
-      },
-      {
-        title: 'No. Apariciones',
-        dataIndex: 'numAppearance',
-        key: 'numAppearance',
-        width: 100,
-        sorter: true,
-        slots: { customRender: 'numAppearance' },
-      },
-      {
-        title: 'Estado',
-        dataIndex: 'status',
-        key: 'status',
-        width: 100,
-        sorter: (a, b) => a.name.localeCompare(b.name),
-        slots: {
-          filterDropdown: 'filterDropdown',
-          filterIcon: 'filterIcon',
-        },
-        onFilter: (value, record) => {
-          return record.status
             .toString()
             .toLowerCase()
             .includes(value.toLowerCase());
@@ -340,10 +302,8 @@ export default defineComponent({
         (item) =>
           record.id !== item.id ||
           record.numAppearance !== item.numAppearance ||
-          record.numSources !== item.numSources ||
           record.variationUF !== item.variationUF ||
-          record.isVariation !== item.isVariation ||
-          record.status !== item.status
+          record.isVariation !== item.isVariation
       );
     },
     async deleteRoByID(record) {
@@ -353,11 +313,7 @@ export default defineComponent({
       await OcurrenceRecord.deleteOcurrenceRecordByID(orID);
 
       this.entryROcurrences = this.entryROcurrences.filter(
-        (item) =>
-          record.id !== item.id ||
-          record.numAppearance !== item.numAppearance ||
-          record.numSources !== item.numSources ||
-          record.status !== item.status
+        (item) => record.id !== item.id
       );
     },
     ocurrenceRecordDetailsShowMethod(record) {
