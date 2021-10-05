@@ -4,7 +4,6 @@ export class OcurrenceRecordStore {
   appearances: [Appearence];
   isVariation: Boolean;
   variationUF: String;
-  status: String;
 }
 
 export class Appearence {

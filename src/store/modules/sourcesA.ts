@@ -2,10 +2,10 @@ export class SourcesStore {
   id: String;
   name: String;
   ref: String;
-  file: String;
   type: String;
   subType: String;
   support: String;
+  stage: String;
 
   // linguisticas libro o prensa
   bloque: String;
