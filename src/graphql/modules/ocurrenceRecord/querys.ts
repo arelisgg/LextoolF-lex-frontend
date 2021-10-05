@@ -11,7 +11,6 @@ export const getAllOcurrenceRecordsQuery = gql`
       }
       isVariation
       variationUF
-      status
     }
   }
 `;
@@ -27,7 +26,6 @@ export const getOcurrenceRecordByIDQuery = gql`
       }
       isVariation
       variationUF
-      status
     }
   }
 `;

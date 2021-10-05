@@ -6,12 +6,12 @@ export const findAllSourcesQuery = gql`
       id
       name
       ref
-      file
       type
       subType
       support
       bloque
       theme
+      stage
       provice_p
       session_p
       magazine_type_p
@@ -36,12 +36,12 @@ export const getSourceByIDQuery = gql`
       id
       name
       ref
-      file
       type
       subType
       support
       bloque
       theme
+      stage
       provice_p
       session_p
       magazine_type_p

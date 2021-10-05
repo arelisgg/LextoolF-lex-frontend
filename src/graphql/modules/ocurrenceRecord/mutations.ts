@@ -11,7 +11,6 @@ export const deleteOcurrenceRecordByIDMutation = gql`
       }
       isVariation
       variationUF
-      status
     }
   }
 `;
@@ -27,7 +26,6 @@ export const createOcurrenceRecordMutation = gql`
       }
       isVariation
       variationUF
-      status
     }
   }
 `;
@@ -45,7 +43,6 @@ export const editOcurrenceRecordMutation = gql`
       }
       isVariation
       variationUF
-      status
     }
   }
 `;
