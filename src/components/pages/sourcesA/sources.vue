@@ -27,9 +27,10 @@
     />
   </a-tooltip>
   <a-table
-    :data-source="sources"
+    :data-source="nestedData"
     :columns="columns"
-    :row-key="(record) => record.id"
+    :row-key="(record) => record.source.id"
+    :expanded-rows-change="onRowExpand"
     bordered
   >
     <template #title>Contextos de Identificación</template>
@@ -86,23 +87,23 @@
         title="Continuar la extracción de UFs de esta Fuente"
         placement="bottom"
       >
-        <a @click="selectSourceToWork(record.id)">
+        <a @click="selectSourceToWork(record.source.id)">
           <CarryOutFilled
             :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
           />
         </a>
       </a-tooltip>
       <a-tooltip title="Detalles de la fuente" placement="bottom">
-        <a @click="sourceDetailsModalShowMethod(record)">
+        <a @click="sourceDetailsModalShowMethod(record.source)">
           <EyeFilled
             :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
           />
         </a>
       </a-tooltip>
       <a-popconfirm
-        v-if="sources.length"
+        v-if="nestedData.length"
         title="Seguro de Eliminar?"
-        @confirm="deleteSourceByID(record.id)"
+        @confirm="deleteSourceByID(record.source.id)"
       >
         <a-tooltip title="Eliminar de la fuente" placement="bottom">
           <a>
@@ -113,12 +114,86 @@
         </a-tooltip>
       </a-popconfirm>
     </template>
+    <template #expandedRowRender="{ record }">
+      <a-table
+        :data-source="record.nestedEntryData"
+        :columns="entryColumns"
+        :row-key="(record) => record.source.id"
+        :pagination="false"
+      >
+        <template #operation="{ record }">
+          <a-tooltip title="Detalles de la Entrada" placement="bottom">
+            <a @click="entryDetailsModalShowMethod(record)">
+              <EyeFilled
+                :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
+              />
+            </a>
+          </a-tooltip>
+          <a-tooltip title="Editar" placement="bottom">
+            <a @click="goToEditEntryA(record)">
+              <EditFilled
+                :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
+              />
+            </a>
+          </a-tooltip>
+        </template>
+        <template
+          #filterDropdown="{
+            setSelectedKeys,
+            selectedKeys,
+            confirm,
+            clearFilters,
+            column,
+          }"
+        >
+          <div style="padding: 8px">
+            <a-input
+              ref="searchInput"
+              :placeholder="`Buscar ${column.title}`"
+              :value="selectedKeys[0]"
+              style="width: 188px; margin-bottom: 8px; display: block"
+              @change="
+                (e) => setSelectedKeys(e.target.value ? [e.target.value] : [])
+              "
+              @pressEnter="handleSearch(confirm)"
+            />
+            <a-button
+              type="primary"
+              size="small"
+              style="width: 90px; margin-right: 8px"
+              @click="handleSearch(confirm)"
+            >
+              <template #icon><SearchOutlined /></template>
+              Search
+            </a-button>
+            <a-button
+              size="small"
+              style="width: 90px"
+              @click="handleReset(clearFilters)"
+            >
+              Reset
+            </a-button>
+          </div>
+        </template>
+        <template #filterIcon="filtered">
+          <search-outlined
+            :style="{ color: filtered ? '#108ee9' : undefined }"
+          />
+        </template>
+      </a-table>
+    </template>
   </a-table>
   <source-details-modal
     v-model:visible="sourceDetailsModalShow"
     :selected-source="selectedSource"
     @close-modal="closeSourceDetailsModal"
   ></source-details-modal>
+  <entry-details-modal
+    v-model:visible="entryDetailsModalShow"
+    :selected-entry="selectedEntry"
+    :file-type="fileType"
+    @close-modal="closeEntryDetailsModal"
+  ></entry-details-modal>
 </template>
 <script lang="ts">
 import {
@@ -131,8 +206,11 @@ import {
 } from '@ant-design/icons-vue';
 import { defineComponent, ref } from 'vue';
 import { Sources } from '@/graphql/modules/sourcesA/model.ts';
+import { EntryA } from '@/graphql/modules/entryA/model.ts';
 import Table from 'ant-design-vue/lib/table';
 import SourceDetailsModal from './sourceDetailsModal.vue';
+
+import EntryDetailsModal from '../entryA/entryDetailsModal.vue';
 
 export default defineComponent({
   components: {
@@ -144,28 +222,34 @@ export default defineComponent({
     PlusSquareFilled,
     SearchOutlined,
     SourceDetailsModal,
+    EntryDetailsModal,
   },
   data() {
     const sourceDetailsModalShow = false;
+    const selectedEntry = {};
+    const entryDetailsModalShow = false;
     const selectedSource = {};
     const searchInput = ref();
     return {
       searchInput,
+      selectedEntry,
+      fileType: '',
       selectedSource,
       sourceDetailsModalShow,
+      entryDetailsModalShow,
       columns: [
         {
           title: 'Nombre',
           key: 'name',
-          dataIndex: 'name',
+          dataIndex: 'source.name',
           width: 150,
-          sorter: (a, b) => a.name.localeCompare(b.name),
+          sorter: (a, b) => a.source.name.localeCompare(b.source.name),
           slots: {
             filterDropdown: 'filterDropdown',
             filterIcon: 'filterIcon',
           },
           onFilter: (value, record) => {
-            return record.name
+            return record.source.name
               .toString()
               .toLowerCase()
               .includes(value.toLowerCase());
@@ -173,15 +257,15 @@ export default defineComponent({
         },
         {
           title: 'Referencia',
-          dataIndex: 'ref',
-          sorter: (a, b) => a.ref.localeCompare(b.ref),
+          dataIndex: 'source.ref',
+          sorter: (a, b) => a.source.ref.localeCompare(b.source.ref),
           width: 300,
           slots: {
             filterDropdown: 'filterDropdown',
             filterIcon: 'filterIcon',
           },
           onFilter: (value, record) => {
-            return record.ref
+            return record.source.ref
               .toString()
               .toLowerCase()
               .includes(value.toLowerCase());
@@ -189,16 +273,49 @@ export default defineComponent({
         },
         {
           key: 'operation',
-          width: 50,
+          width: 70,
           slots: { customRender: 'operation' },
         },
       ],
-      sources: [],
+      entryColumns: [
+        {
+          title: 'UF',
+          dataIndex: 'UF',
+          sorter: (a, b) => a.UF.localeCompare(b.UF),
+          width: 300,
+          slots: {
+            filterDropdown: 'filterDropdown',
+            filterIcon: 'filterIcon',
+          },
+          onFilter: (value, record) => {
+            return record.UF.toString()
+              .toLowerCase()
+              .includes(value.toLowerCase());
+          },
+        },
+        {
+          title: 'Operación',
+          key: 'operation',
+          width: 70,
+          slots: { customRender: 'operation' },
+        },
+      ],
+      nestedData: [],
     };
   },
   async mounted() {
     const { data } = await Sources.findAllSources();
-    this.sources = data.findAllSources;
+    const sources = data.findAllSources;
+    for (let i = 0; i < sources.length; i++) {
+      const e = sources[i];
+      const nestedObject = {} as { source: {}; nestedEntryData: [] };
+      nestedObject.source = e;
+      const entry = await EntryA.getAllEntriesBySourceID(e.id);
+      const entriesOfTheSource = entry.data.getAllEntriesBySourceID;
+      nestedObject.nestedEntryData = entriesOfTheSource;
+      this.nestedData.push(nestedObject);
+    }
+    console.log('this.nestedData', this.nestedData);
   },
   methods: {
     onAdd() {
@@ -212,6 +329,11 @@ export default defineComponent({
     },
     handleSearch: (confirm) => {
       confirm();
+    },
+    selectFilterOption(input: string, option: any) {
+      return (
+        option.props.value.name.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      );
     },
     handleReset: (clearFilters) => {
       clearFilters();
@@ -233,6 +355,26 @@ export default defineComponent({
         name: 'extractionTask',
         params: {
           source: sourceID,
+        },
+      });
+    },
+    onRowExpand(e) {
+      console.log('e', e);
+    },
+    entryDetailsModalShowMethod(entry) {
+      this.selectedEntry = entry;
+      this.fileType = this.selectedEntry.context.split('_')[0];
+      this.entryDetailsModalShow = true;
+      console.log('selectedEntry esta:', this.selectedEntry);
+    },
+    closeEntryDetailsModal() {
+      this.entryDetailsModalShow = false;
+    },
+    goToEditEntryA(selectedEntry) {
+      this.$router.push({
+        name: 'editEntryA',
+        params: {
+          id: selectedEntry.id,
         },
       });
     },
