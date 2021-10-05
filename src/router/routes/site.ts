@@ -28,6 +28,7 @@ const newVariationRecord = () =>
   import('@/components/pages/ocurrenceRecordA/newVariationRecord.vue');
 const firstEntrySource = () =>
   import('@/components/pages/entryA/firstEntrySource.vue');
+const editEntryA = () => import('@/components/pages/entryA/editEntryA.vue');
 
 export const SiteRoutes: RouteRecordRaw[] & any = [
   {
@@ -119,6 +120,12 @@ export const SiteRoutes: RouteRecordRaw[] & any = [
     exact: true,
     path: 'firstEntry',
     component: firstEntrySource,
+  },
+  {
+    name: 'editEntryA',
+    exact: true,
+    path: 'editEntryA/:id',
+    component: editEntryA,
   },
   {
     name: 'entries',

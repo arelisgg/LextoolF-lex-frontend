@@ -16,6 +16,7 @@ import { DictionaryAStore } from './modules/dictionaryA';
 import { LemarioStore } from './modules/lemarioA';
 import { EntryAStore } from './modules/entryA';
 import { OcurrenceRecordStore } from './modules/ocurrenceRecord';
+import { Nomenclator } from './modules/nomenclator';
 
 export const store = reactive({
   layout: new LayoutStore(),
@@ -39,4 +40,5 @@ export const store = reactive({
   entriesA: [EntryAStore],
   entryA: new EntryAStore(),
   ocurrenceRecord: new OcurrenceRecordStore(),
+  nomenclator: new Nomenclator(),
 });
