@@ -121,7 +121,7 @@
         :row-key="(record) => record.source.id"
         :pagination="false"
       >
-        <template #operation="{ record }">
+        <template #operation>
           <a-tooltip title="Detalles de la Entrada" placement="bottom">
             <a @click="entryDetailsModalShowMethod(record)">
               <EyeFilled
@@ -324,7 +324,7 @@ export default defineComponent({
       });
     },
     async deleteSourceByID(id) {
-      const deletedSource = await Sources.deleteSourceByID(id);
+      await Sources.deleteSourceByID(id);
       this.sources = this.sources.filter((item) => item.id !== id);
     },
     handleSearch: (confirm) => {

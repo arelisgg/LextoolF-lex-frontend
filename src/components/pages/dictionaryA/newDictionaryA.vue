@@ -1,3 +1,4 @@
+/* eslint-disable */
 <template>
   <h4>Crear Nuevo Proyecto de Diccionario</h4>
   <br />

@@ -55,11 +55,6 @@ export default defineComponent({
   data: () => ({
     links: [
       {
-        text: 'Estudios Fraseologicos',
-        icon: 'ion-ios-book-outline',
-        to: { name: 'studies' },
-      },
-      {
         text: 'Proyecto de Lemario',
         icon: 'ion-ios-book',
         to: { name: 'sources' },

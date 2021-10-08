@@ -94,7 +94,7 @@
 </template>
 <script lang="ts">
 /* eslint-disable vue/no-mutating-props */
-import { defineComponent, h } from 'vue';
+import { defineComponent } from 'vue';
 import { CheckOutlined } from '@ant-design/icons-vue';
 
 export default defineComponent({

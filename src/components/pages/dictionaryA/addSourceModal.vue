@@ -1,3 +1,4 @@
+/* eslint-disable */
 <template>
   <a-modal title="Asociar Fuente:" @ok="submit">
     <a-form :model="source">
