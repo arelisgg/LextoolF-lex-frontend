@@ -15,8 +15,8 @@ export const deleteEntryByIDMutation = gql`
 `;
 
 export const deleteEntryDocByIDMutation = gql`
-  mutation deleteEntryDocByID($orID: String!, $entryID: String!) {
-    deleteEntryDocByID(orID: $orID, entryID: $entryID) {
+  mutation deleteEntryDocByID($entryID: String!, $orID: String!) {
+    deleteEntryDocByID(entryID: $entryID, orID: $orID) {
       id
       lemma
       letter

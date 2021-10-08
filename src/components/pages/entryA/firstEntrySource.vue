@@ -240,7 +240,7 @@
                     >
                       <a-select-option
                         v-for="dictionaryType in dictionariesTypes"
-                        :key="dictionaryType.id"
+                        :key="dictionaryType.nombre"
                       >
                         {{ dictionaryType.nombre }}
                       </a-select-option>
@@ -1125,19 +1125,19 @@ export default defineComponent({
     },
     typologySelected(value) {
       console.log('value', value);
-      this.source.typology = value.nombre;
+      this.source.typology = value;
     },
     themeSelected(value) {
       console.log('value', value);
-      this.source.theme = value.nombre;
+      this.source.theme = value;
     },
     sessionSelected(value) {
       console.log('value', value);
-      this.source.session_p = value.nombre;
+      this.source.session_p = value;
     },
     dictionaryTypeSelected(value) {
       console.log('value', value);
-      this.source.dictionaryType = value.nombre;
+      this.source.dictionaryType = value;
     },
     callback(key) {
       console.log(key);

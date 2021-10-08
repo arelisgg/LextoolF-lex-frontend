@@ -111,10 +111,10 @@ export class EntryA {
     );
   }
 
-  static deleteEntryDocByID(orID: String, entryID: String) {
+  static deleteEntryDocByID(entryID: String, orID: String) {
     return apolloMutate(
       deleteEntryDocByIDMutation,
-      { orID, entryID },
+      { entryID, orID },
       null,
       null,
       apolloClientA
