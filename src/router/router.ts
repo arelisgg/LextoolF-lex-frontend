@@ -1,3 +1,4 @@
+/* eslint-disable */
 import modal from 'ant-design-vue/lib/modal';
 import { createRouter, createWebHistory } from 'vue-router';
 

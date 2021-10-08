@@ -1,7 +1,6 @@
 import { RouteRecordRaw } from 'vue-router';
 
 const home = () => import('@/components/pages/home.vue');
-
 const sources = () => import('@/components/pages/sourcesA/sources.vue');
 const entries = () => import('@/components/pages/entryA/entries.vue');
 const dictionariesA = () =>
@@ -99,13 +98,13 @@ export const SiteRoutes: RouteRecordRaw[] & any = [
   {
     name: 'newOcurrenceRecord',
     exact: true,
-    path: 'newOcurrenceRecord',
+    path: 'newOcurrenceRecord/:id',
     component: newOcurrenceRecord,
   },
   {
     name: 'newVariationRecord',
     exact: true,
-    path: 'newVariationRecord',
+    path: 'newVariationRecord/:id',
     component: newVariationRecord,
   },
 ];
