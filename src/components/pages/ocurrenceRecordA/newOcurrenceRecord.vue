@@ -118,26 +118,26 @@
             ref="name"
             label="Nombre de la Fuente"
             name="name"
-            :label-col="labelColModal"
-            :wrapper-col="wrapperColModal"
+            :label-col="labelCol"
+            :wrapper-col="wrapperCol"
           >
             <a-input
               v-model:value="source.name"
               placeholde="Nombre de la Fuente"
-              :style="{ width: '350px' }"
+              :style="{ width: '450px' }"
             ></a-input>
           </a-form-item>
           <a-form-item
             ref="ref"
             label="Referencia"
             name="ref"
-            :label-col="labelColModal"
-            :wrapper-col="wrapperColModal"
+            :label-col="labelCol"
+            :wrapper-col="wrapperCol"
           >
             <a-textarea
               v-model:value="source.ref"
               placeholder="Referencia de la Fuente"
-              :style="{ width: '350px' }"
+              :style="{ width: '450px' }"
               allow-clear
             />
           </a-form-item>
@@ -145,29 +145,13 @@
             ref="type"
             label="Datos de clasificación"
             name="type"
-            :label-col="labelColModal"
-            :wrapper-col="wrapperColModal"
+            :label-col="labelCol"
+            :wrapper-col="wrapperCol"
           >
             <a-cascader
-              v-if="showPreviewAudio"
-              :options="options"
-              :default-value="['Linguística', 'Oral', 'Audio']"
-              placeholder="Seleccione una Tipo"
-              :style="{ width: '350px' }"
-              @change="handleOptionsChange"
-            />
-            <a-cascader
-              v-else-if="showPreview"
-              :options="options"
-              :default-value="['Linguística', 'Oral', 'Video']"
-              placeholder="Seleccione una Tipo"
-              @change="handleOptionsChange"
-            />
-            <a-cascader
-              v-else
               :options="options"
               placeholder="Seleccione una Tipo"
-              :style="{ width: '350px' }"
+              :style="{ width: '450px' }"
               @change="handleOptionsChange"
             />
           </a-form-item>
@@ -175,13 +159,13 @@
             ref="URL"
             label="URL de la Fuente"
             name="URL"
-            :label-col="labelColModal"
-            :wrapper-col="wrapperColModal"
+            :label-col="labelCol"
+            :wrapper-col="wrapperCol"
           >
             <a-input
               v-model:value="source.URL"
               placeholde="URL de la Fuente"
-              :style="{ width: '350px' }"
+              :style="{ width: '450px' }"
             ></a-input>
           </a-form-item>
         </a-form>
@@ -200,13 +184,13 @@
               ref="dictionaryType"
               label="Tipo de diccionario"
               name="dictionaryType"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-space direction="horizontal" align="center">
                 <a-select
                   v-model:value="source.dictionaryType"
-                  :style="{ width: '350px' }"
+                  :style="{ width: '450px' }"
                   @change="dictionaryTypeSelected"
                 >
                   <a-select-option
@@ -232,13 +216,13 @@
               ref="century"
               label="Siglo"
               name="century"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-input
                 v-model:value="source.century"
                 placeholde="Siglo"
-                :style="{ width: '350px' }"
+                :style="{ width: '450px' }"
               ></a-input>
             </a-form-item>
             <div
@@ -251,26 +235,26 @@
                 ref="library_name"
                 label="Biblioteca Virtual"
                 name="library_name"
-                :label-col="labelColModal"
-                :wrapper-col="wrapperColModal"
+                :label-col="labelCol"
+                :wrapper-col="wrapperCol"
               >
                 <a-input
                   v-model:value="source.library_name"
                   placeholde="Nombre de la biblioteca Virtual"
-                  :style="{ width: '350px' }"
+                  :style="{ width: '450px' }"
                 ></a-input>
               </a-form-item>
               <a-form-item
                 ref="url_location"
                 label="Localización URL"
                 name="url_location"
-                :label-col="labelColModal"
-                :wrapper-col="wrapperColModal"
+                :label-col="labelCol"
+                :wrapper-col="wrapperCol"
               >
                 <a-input
                   v-model:value="source.url_location"
                   placeholde="Localización URL"
-                  :style="{ width: '350px' }"
+                  :style="{ width: '450px' }"
                 ></a-input>
               </a-form-item>
             </div>
@@ -280,12 +264,12 @@
               ref="bloque"
               label="Bloque de la Fuente"
               name="bloque"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-select
                 :default-value="bloques[0]"
-                :style="{ width: '350px' }"
+                :style="{ width: '450px' }"
                 @change="handleBloqueChange"
               >
                 <a-select-option v-for="bloque in bloques" :key="bloque">
@@ -297,13 +281,13 @@
               ref="theme"
               label="Clasificación temática"
               name="theme"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-space direction="horizontal" align="center">
                 <a-select
                   v-if="bloqueSelected === 'NoFicción'"
-                  :style="{ width: '350px' }"
+                  :style="{ width: '450px' }"
                   placeholder="Seleccione un Tema"
                   @change="themeSelected"
                 >
@@ -327,7 +311,7 @@
               >
                 <a-select
                   v-if="bloqueSelected === 'Ficción'"
-                  :style="{ width: '350px' }"
+                  :style="{ width: '450px' }"
                   placeholder="Seleccione un Género"
                   @change="themeSelected"
                 >
@@ -350,11 +334,11 @@
               ref="session_p"
               label="Sección del Periódico"
               name="session_p"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-space direction="horizontal" align="center">
-                <a-select :style="{ width: '350px' }" @change="sessionSelected">
+                <a-select :style="{ width: '450px' }" @change="sessionSelected">
                   <a-select-option v-for="sp in sessions_p" :key="sp.nombre">
                     {{ sp.nombre }}
                   </a-select-option>
@@ -376,12 +360,12 @@
               ref="magazine_type_p"
               label="Tipo de revista"
               name="magazine_type_p"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-select
                 v-model:value="source.magazine_type_p"
-                :style="{ width: '350px' }"
+                :style="{ width: '450px' }"
               >
                 <a-select-option v-for="mtp in magazine_type_p" :key="mtp">
                   {{ mtp }}
@@ -396,12 +380,12 @@
               ref="speaker"
               label="Descripción del Hablante"
               name="speaker"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-textarea
                 v-model:value="source.speaker"
-                :style="{ width: '350px' }"
+                :style="{ width: '450px' }"
                 placeholder="Tenga en cuenta los datos nombre, sexo, grupo etario, nivel educacional, profesión, ciudad de origen, provincia."
                 allow-clear
               />
@@ -410,12 +394,12 @@
               ref="typology"
               label="Tipología"
               name="typology"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-space direction="horizontal" align="center">
                 <a-select
-                  :style="{ width: '350px' }"
+                  :style="{ width: '450px' }"
                   @change="typologySelected"
                 >
                   <a-select-option
@@ -438,12 +422,12 @@
               ref="broadcastMedium"
               label="Medio de Difusión"
               name="broadcastMedium"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-select
                 v-model:value="source.broadcastMedium"
-                :style="{ width: '350px' }"
+                :style="{ width: '450px' }"
               >
                 <a-select-option
                   v-for="broadcastMedium in broadcastMediums"
@@ -457,8 +441,8 @@
               ref="recording_date"
               label="Fecha de grabación"
               name="recording_date"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-date-picker
                 style="width: 300px"
@@ -471,8 +455,8 @@
               ref="broadcast_date"
               label="Fecha de emisión"
               name="broadcast_date"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-date-picker
                 style="width: 300px"
@@ -485,8 +469,8 @@
               ref="cantMin"
               label="Tiempo de duración"
               name="cantMin"
-              :label-col="labelColModal"
-              :wrapper-col="wrapperColModal"
+              :label-col="labelCol"
+              :wrapper-col="wrapperCol"
             >
               <a-time-picker
                 style="width: 300px"
@@ -500,32 +484,14 @@
       </a-tab-pane>
     </a-tabs>
   </div>
-  <div class="container-content">
-    <croppie-modal @crop="crop"></croppie-modal>
+  <croppie-modal @crop="crop"></croppie-modal>
+  <div class="w-100">
     <carrousel-images
       :images="images"
-      :selected-image-index="selectedImageIndex"
-      @select-image="changeSelectedImage"
+      :show-delete-icon="true"
+      :show-add-image="true"
+      @delete-image="deleteImage"
     ></carrousel-images>
-    <br />
-    <a-alert
-      v-if="images.length === 0"
-      message='Click en cualquier parte de la ventana y luego "CTRL + V" para pegar la Imagen'
-      type="info"
-      show-icon
-    />
-  </div>
-  <div>
-    <br />
-    <a-button
-      v-if="selectedImageIndex !== -1"
-      type="primary"
-      danger
-      @click="deleteImage"
-    >
-      <DeleteOutlined />
-      Eliminar
-    </a-button>
   </div>
   <a-form ref="formRef" :model="ocurrenceRecord" :rules="rules">
     <div style="text-align: right">
@@ -743,6 +709,8 @@ export default defineComponent({
     const images = [];
     const selectedImageIndex = -1;
     return {
+      entryA,
+      loading,
       images,
       selectedImageIndex,
       formRef,
@@ -771,10 +739,8 @@ export default defineComponent({
       formRefS,
       magazine_type_p,
       broadcastMediums,
-      formItemLayoutWithOutLabelModal,
       source,
-      labelColModal: { span: 8 },
-      wrapperColModal: { span: 14 },
+      formItemLayoutWithOutLabelModal,
     };
   },
   async mounted() {
@@ -796,6 +762,7 @@ export default defineComponent({
   },
   methods: {
     async submit() {
+      this.loading = true;
       this.source.stage = 'Documentación';
       const s = await this.createSource();
       const sourceID = s.data.createSource.id;
@@ -858,9 +825,8 @@ export default defineComponent({
         this.selectedImageIndex = index;
       }
     },
-    deleteImage() {
-      this.images.splice(this.selectedImageIndex, 1);
-      this.selectedImageIndex = -1;
+    deleteImage(index) {
+      this.images.splice(index, 1);
     },
     async createOcurrenceRecord() {
       this.loading = true;
@@ -871,7 +837,9 @@ export default defineComponent({
       console.log('or', or);
 
       //añadiendo el registro de ocurrencias a la documentacion de la entrada
-      let newEntry = this.$store.entryA;
+      const id = this.$route.params.id.toString();
+      const e = await EntryA.getEntryByIDWithDocs(id);
+      let newEntry = e.data.getEntryByIDWithDocs;
       newEntry.documentation.push(or.id);
       await EntryA.updateEntryDocumentation(newEntry);
     },
@@ -972,24 +940,25 @@ export default defineComponent({
     },
 
     handleBloqueChange(value) {
+      console.log('value', value);
       this.bloqueSelected = value;
       this.source.bloque = value;
     },
     typologySelected(value) {
       console.log('value', value);
-      this.source.typology = value.nombre;
+      this.source.typology = value;
     },
     themeSelected(value) {
       console.log('value', value);
-      this.source.theme = value.nombre;
+      this.source.theme = value;
     },
     sessionSelected(value) {
       console.log('value', value);
-      this.source.session_p = value.nombre;
+      this.source.session_p = value;
     },
     dictionaryTypeSelected(value) {
       console.log('value', value);
-      this.source.dictionaryType = value.nombre;
+      this.source.dictionaryType = value;
     },
   },
 });
@@ -1006,17 +975,5 @@ export default defineComponent({
   background-color: #f6f6f6;
   min-height: 200px;
   padding: 20px;
-}
-
-.container-content {
-  margin-top: 16px;
-  margin-bottom: 16px;
-  border-radius: 6px;
-  border: 1px dashed #e9e9e9;
-  background-color: #f6f6f6;
-  min-height: 200px;
-  height: 270px;
-  padding: 20px;
-  overflow: auto;
 }
 </style>

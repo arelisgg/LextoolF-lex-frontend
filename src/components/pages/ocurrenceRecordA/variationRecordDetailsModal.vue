@@ -2,68 +2,71 @@
   <a-modal
     :visible="visible"
     title="Detalles del Registro de Ocurrencias"
-    width="900px"
+    width="800px"
     :footer="null"
     @cancel="closeModal"
   >
     <a-descriptions>
       <a-descriptions-item label="Nombre">
-        {{ selectedOcurrenceRecord.source.name }}
+        {{ selectedVariationRecord.or.variationUF }}
+      </a-descriptions-item>
+      <a-descriptions-item label="Nombre">
+        {{ selectedVariationRecord.source.name }}
       </a-descriptions-item>
       <a-descriptions-item label="Referencia" :span="2">
-        {{ selectedOcurrenceRecord.source.ref }}
+        {{ selectedVariationRecord.source.ref }}
       </a-descriptions-item>
       <a-descriptions-item label="Tipo">
-        {{ selectedOcurrenceRecord.source.type }}
+        {{ selectedVariationRecord.source.type }}
       </a-descriptions-item>
       <a-descriptions-item label="Medio">
-        {{ selectedOcurrenceRecord.source.subType }}
+        {{ selectedVariationRecord.source.subType }}
       </a-descriptions-item>
       <a-descriptions-item label="Soporte">
-        {{ selectedOcurrenceRecord.source.support }}
+        {{ selectedVariationRecord.source.support }}
       </a-descriptions-item>
     </a-descriptions>
     <div v-if="sourceType === 'Linguística'">
       <a-descriptions>
         <a-descriptions-item label="Bloque">
-          {{ selectedOcurrenceRecord.source.bloque }}
+          {{ selectedVariationRecord.source.bloque }}
         </a-descriptions-item>
         <a-descriptions-item v-if="sourceBloque === 'NoFicción'" label="Tema">
-          {{ selectedOcurrenceRecord.source.theme }}
+          {{ selectedVariationRecord.source.theme }}
         </a-descriptions-item>
         <a-descriptions-item v-if="sourceBloque === 'Ficción'" label="Género">
-          {{ selectedOcurrenceRecord.source.theme }}
+          {{ selectedVariationRecord.source.theme }}
         </a-descriptions-item>
       </a-descriptions>
       <div v-if="sourceSupport === 'Publicación Periódica'">
         <a-descriptions>
           <a-descriptions-item label="Sección del Periódico">
-            {{ selectedOcurrenceRecord.source.session_p }}
+            {{ selectedVariationRecord.source.session_p }}
           </a-descriptions-item>
           <a-descriptions-item label="Tipo de revista">
-            {{ selectedOcurrenceRecord.source.magazine_type_p }}
+            {{ selectedVariationRecord.source.magazine_type_p }}
           </a-descriptions-item>
         </a-descriptions>
       </div>
       <div v-if="sourceType === 'Oral'">
         <a-descriptions>
           <a-descriptions-item label="Descripción del Hablante" :span="2">
-            {{ selectedOcurrenceRecord.source.speaker }}
+            {{ selectedVariationRecord.source.speaker }}
           </a-descriptions-item>
           <a-descriptions-item label="Medio de Difusión">
-            {{ selectedOcurrenceRecord.source.broadcastMedium }}
+            {{ selectedVariationRecord.source.broadcastMedium }}
           </a-descriptions-item>
           <a-descriptions-item label="Tipología">
-            {{ selectedOcurrenceRecord.source.typology }}
+            {{ selectedVariationRecord.source.typology }}
           </a-descriptions-item>
           <a-descriptions-item label="Duración">
-            {{ selectedOcurrenceRecord.source.cantMin }}
+            {{ selectedVariationRecord.source.cantMin }}
           </a-descriptions-item>
           <a-descriptions-item label="Fecha de grabación">
-            {{ selectedOcurrenceRecord.source.recording_date }}
+            {{ selectedVariationRecord.source.recording_date }}
           </a-descriptions-item>
           <a-descriptions-item label="Fecha de emisión">
-            {{ selectedOcurrenceRecord.source.broadcast_date }}
+            {{ selectedVariationRecord.source.broadcast_date }}
           </a-descriptions-item>
         </a-descriptions>
       </div>
@@ -71,16 +74,16 @@
     <div v-if="sourceType === 'Metalinguística'">
       <a-descriptions>
         <a-descriptions-item label="Tipo de Diccionario">
-          {{ selectedOcurrenceRecord.source.dictionaryType }}
+          {{ selectedVariationRecord.source.dictionaryType }}
         </a-descriptions-item>
         <a-descriptions-item label="Siglo">
-          {{ selectedOcurrenceRecord.source.century }}
+          {{ selectedVariationRecord.source.century }}
         </a-descriptions-item>
         <a-descriptions-item label="Nombre de la biblioteca">
-          {{ selectedOcurrenceRecord.source.library_name }}
+          {{ selectedVariationRecord.source.library_name }}
         </a-descriptions-item>
         <a-descriptions-item label="Localización URL">
-          {{ selectedOcurrenceRecord.source.url_location }}
+          {{ selectedVariationRecord.source.url_location }}
         </a-descriptions-item>
       </a-descriptions>
     </div>
@@ -106,7 +109,7 @@ export default defineComponent({
   },
   // eslint-disable-next-line vue/require-prop-types
   props: [
-    'selectedOcurrenceRecord',
+    'selectedVariationRecord',
     'sourceType',
     'sourceSupport',
     'sourceBloque',
@@ -115,9 +118,9 @@ export default defineComponent({
   ],
   emits: ['close-modal'],
   data() {
-    const selectedOcurrenceRecordData = {};
+    const selectedVariationRecordData = {};
     return {
-      selectedOcurrenceRecordData,
+      selectedVariationRecordData,
     };
   },
   methods: {

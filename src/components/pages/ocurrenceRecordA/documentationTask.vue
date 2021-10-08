@@ -54,7 +54,7 @@
               size="small"
               :pagination="{ pageSize: 10 }"
               :scroll="{ y: 282 }"
-              :row-key="(record) => record.id"
+              :row-key="(record) => record.or.id"
               bordered
             >
               <template #title>
@@ -74,10 +74,7 @@
                   title="Detalles del Registro de Ocurrencias"
                   placement="bottom"
                 >
-                  <a
-                    v-if="record.status === 'Terminado'"
-                    @click="roDetailsModalShowMethod(record)"
-                  >
+                  <a @click="roDetailsModalShowMethod(record)">
                     <EyeFilled
                       :style="{
                         fontSize: '20px',
@@ -113,6 +110,50 @@
                   </a>
                 </a-popconfirm>
               </template>
+              <template
+                #filterDropdown="{
+                  setSelectedKeys,
+                  selectedKeys,
+                  confirm,
+                  clearFilters,
+                  column,
+                }"
+              >
+                <div style="padding: 8px">
+                  <a-input
+                    ref="searchInput"
+                    :placeholder="`Buscar ${column.title}`"
+                    :value="selectedKeys[0]"
+                    style="width: 188px; margin-bottom: 8px; display: block"
+                    @change="
+                      (e) =>
+                        setSelectedKeys(e.target.value ? [e.target.value] : [])
+                    "
+                    @pressEnter="handleSearch(confirm)"
+                  />
+                  <a-button
+                    type="primary"
+                    size="small"
+                    style="width: 90px; margin-right: 8px"
+                    @click="handleSearch(confirm)"
+                  >
+                    <template #icon><SearchOutlined /></template>
+                    Search
+                  </a-button>
+                  <a-button
+                    size="small"
+                    style="width: 90px"
+                    @click="handleReset(clearFilters)"
+                  >
+                    Reset
+                  </a-button>
+                </div>
+              </template>
+              <template #filterIcon="filtered">
+                <search-outlined
+                  :style="{ color: filtered ? '#108ee9' : undefined }"
+                />
+              </template>
             </a-table>
           </div>
         </a-tab-pane>
@@ -134,6 +175,50 @@
               :row-key="(record) => record.id"
               bordered
             >
+              <template
+                #filterDropdown="{
+                  setSelectedKeys,
+                  selectedKeys,
+                  confirm,
+                  clearFilters,
+                  column,
+                }"
+              >
+                <div style="padding: 8px">
+                  <a-input
+                    ref="searchInput"
+                    :placeholder="`Buscar ${column.title}`"
+                    :value="selectedKeys[0]"
+                    style="width: 188px; margin-bottom: 8px; display: block"
+                    @change="
+                      (e) =>
+                        setSelectedKeys(e.target.value ? [e.target.value] : [])
+                    "
+                    @pressEnter="handleSearch(confirm)"
+                  />
+                  <a-button
+                    type="primary"
+                    size="small"
+                    style="width: 90px; margin-right: 8px"
+                    @click="handleSearch(confirm)"
+                  >
+                    <template #icon><SearchOutlined /></template>
+                    Search
+                  </a-button>
+                  <a-button
+                    size="small"
+                    style="width: 90px"
+                    @click="handleReset(clearFilters)"
+                  >
+                    Reset
+                  </a-button>
+                </div>
+              </template>
+              <template #filterIcon="filtered">
+                <search-outlined
+                  :style="{ color: filtered ? '#108ee9' : undefined }"
+                />
+              </template>
               <template #title>
                 Registro de Variaciones
                 <a-tooltip
@@ -165,10 +250,7 @@
                   title="Detalles del Registro de Variación"
                   placement="bottom"
                 >
-                  <a
-                    v-if="record.status === 'Terminado'"
-                    @click="rvDetailsModalShowMethod(record)"
-                  >
+                  <a @click="rvDetailsModalShowMethod(record)">
                     <EyeFilled
                       :style="{
                         fontSize: '20px',
@@ -196,9 +278,23 @@
       </a-tabs>
     </div>
   </a-space>
+  <variation-record-details-modal
+    v-model:visible="variationRecordDetailsModalShow"
+    :source-type="sourceType"
+    :source-support="sourceSupport"
+    :source-bloque="sourceBloque"
+    :images="images"
+    :selected-variation-record="selectedVariationRecord"
+    @close-modal="closeRVDetailsModal"
+  ></variation-record-details-modal>
   <ocurrence-record-details-modal
     v-model:visible="ocurrenceRecordDetailsShow"
+    :source-type="sourceType"
+    :source-support="sourceSupport"
+    :source-bloque="sourceBloque"
+    :images="images"
     :selected-ocurrence-record="selectedOcurrenceRecord"
+    @close-modal="closeRODetailsModal"
   ></ocurrence-record-details-modal>
 </template>
 <script lang="ts">
@@ -211,8 +307,10 @@ import {
 } from '@ant-design/icons-vue';
 import { defineComponent } from 'vue';
 import OcurrenceRecordDetailsModal from './ocurrenceRecordDetailsModal.vue';
+import VariationRecordDetailsModal from './variationRecordDetailsModal.vue';
 import { EntryA } from '@/graphql/modules/entryA/model.ts';
 import { OcurrenceRecord } from '@/graphql/modules/ocurrenceRecord/model';
+import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 
 export default defineComponent({
   components: {
@@ -221,7 +319,8 @@ export default defineComponent({
     EyeFilled,
     EditFilled,
     SearchOutlined,
-    OcurrenceRecordDetailsModal,
+    'ocurrence-record-details-modal': OcurrenceRecordDetailsModal,
+    'variation-record-details-modal': VariationRecordDetailsModal,
   },
   data() {
     const entrySelected = {
@@ -235,12 +334,44 @@ export default defineComponent({
     };
     const columnsO = [
       {
+        title: 'Nombre de la Fuente',
+        key: 'name',
+        dataIndex: 'source.name',
+        width: 150,
+        sorter: (a, b) => a.source.name.localeCompare(b.source.name),
+        slots: {
+          filterDropdown: 'filterDropdown',
+          filterIcon: 'filterIcon',
+        },
+        onFilter: (value, record) => {
+          return record.source.name
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase());
+        },
+      },
+      {
+        title: 'Referencia de la Fuente',
+        dataIndex: 'source.ref',
+        sorter: (a, b) => a.source.ref.localeCompare(b.source.ref),
+        width: 300,
+        slots: {
+          filterDropdown: 'filterDropdown',
+          filterIcon: 'filterIcon',
+        },
+        onFilter: (value, record) => {
+          return record.source.ref
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase());
+        },
+      },
+      {
         title: 'No. Apariciones',
-        dataIndex: 'numAppearance',
+        dataIndex: 'or.numAppearance',
         key: 'numAppearance',
         width: 100,
-        sorter: true,
-        slots: { customRender: 'numAppearance' },
+        sorter: (a, b) => a.or.numAppearance.localeCompare(b.or.numAppearance),
       },
       {
         title: '',
@@ -252,20 +383,60 @@ export default defineComponent({
     const columnsV = [
       {
         title: 'Variación',
-        dataIndex: 'variationUF',
+        dataIndex: 'or.variationUF',
         key: 'variationUF',
-        width: 100,
+        width: 150,
         sorter: (a, b) => a.name.localeCompare(b.name),
         slots: {
           filterDropdown: 'filterDropdown',
           filterIcon: 'filterIcon',
         },
         onFilter: (value, record) => {
-          return record.variationUF
+          return record.or.variationUF
             .toString()
             .toLowerCase()
             .includes(value.toLowerCase());
         },
+      },
+      {
+        title: 'Nombre de la Fuente',
+        key: 'name',
+        dataIndex: 'source.name',
+        width: 100,
+        sorter: (a, b) => a.source.name.localeCompare(b.source.name),
+        slots: {
+          filterDropdown: 'filterDropdown',
+          filterIcon: 'filterIcon',
+        },
+        onFilter: (value, record) => {
+          return record.source.name
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase());
+        },
+      },
+      {
+        title: 'Referencia de la Fuente',
+        dataIndex: 'source.ref',
+        sorter: (a, b) => a.source.ref.localeCompare(b.source.ref),
+        width: 250,
+        slots: {
+          filterDropdown: 'filterDropdown',
+          filterIcon: 'filterIcon',
+        },
+        onFilter: (value, record) => {
+          return record.source.ref
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase());
+        },
+      },
+      {
+        title: 'No. Apariciones',
+        dataIndex: 'or.numAppearance',
+        key: 'numAppearance',
+        width: 100,
+        sorter: (a, b) => a.or.numAppearance.localeCompare(b.or.numAppearance),
       },
       {
         title: '',
@@ -275,13 +446,25 @@ export default defineComponent({
       },
     ];
     const ocurrenceRecordDetailsShow = false;
+    const variationRecordDetailsModalShow = false;
     const selectedOcurrenceRecord = {};
+    const selectedVariationRecord = {};
+    const sourceType = '';
+    const sourceSupport = '';
+    const sourceBloque = '';
+    const images = [];
     return {
       entrySelected,
+      images,
+      sourceType,
+      sourceSupport,
+      sourceBloque,
       columnsO,
       columnsV,
       ocurrenceRecordDetailsShow,
+      variationRecordDetailsModalShow,
       selectedOcurrenceRecord,
+      selectedVariationRecord,
       entryRVariations: [],
       entryROcurrences: [],
       canditateUFs: [],
@@ -295,30 +478,25 @@ export default defineComponent({
   methods: {
     async deleteRvByID(record) {
       const entryID = this.entrySelected.id;
-      const vrID = record.id;
-      await EntryA.deleteEntryDocByID(vrID, entryID);
+      const vrID = record.or.id;
+      await EntryA.deleteEntryDocByID(entryID, vrID);
       await OcurrenceRecord.deleteOcurrenceRecordByID(vrID);
+      await Sources.deleteSourceByID(record.or.source);
       this.entrySelected.documentation = this.entrySelected.documentation.filter(
         (item) =>
-          record.id !== item.id ||
-          record.numAppearance !== item.numAppearance ||
-          record.variationUF !== item.variationUF ||
-          record.isVariation !== item.isVariation
+          record.or.id !== item.or.id ||
+          record.or.variationUF !== item.or.variationUF
       );
     },
     async deleteRoByID(record) {
       const entryID = this.entrySelected.id;
-      const orID = record.id;
-      await EntryA.deleteEntryDocByID(orID, entryID);
+      const orID = record.or.id;
+      await EntryA.deleteEntryDocByID(entryID, orID);
       await OcurrenceRecord.deleteOcurrenceRecordByID(orID);
-
+      await Sources.deleteSourceByID(record.or.source);
       this.entryROcurrences = this.entryROcurrences.filter(
-        (item) => record.id !== item.id
+        (item) => record.or.id !== item.or.id
       );
-    },
-    ocurrenceRecordDetailsShowMethod(record) {
-      this.selectedOcurrenceRecord = record;
-      this.ocurrenceRecordDetailsShow = !this.ocurrenceRecordDetailsShow;
     },
     callback(key) {
       console.log(key);
@@ -326,12 +504,22 @@ export default defineComponent({
     async onAddOR() {
       const { data } = await EntryA.getEntryByIDWithDocs(this.entrySelected.id);
       this.$store.entryA = data.getEntryByIDWithDocs;
-      this.$router.push({ name: 'newOcurrenceRecord' });
+      this.$router.push({
+        name: 'newOcurrenceRecord',
+        params: {
+          id: this.entrySelected.id,
+        },
+      });
     },
     async onAddVR() {
       const { data } = await EntryA.getEntryByIDWithDocs(this.entrySelected.id);
       this.$store.entryA = data.getEntryByIDWithDocs;
-      this.$router.push({ name: 'newVariationRecord' });
+      this.$router.push({
+        name: 'newVariationRecord',
+        params: {
+          id: this.entrySelected.id,
+        },
+      });
     },
     filterFunction() {
       var input, filter, a, i, div, txtValue;
@@ -361,11 +549,27 @@ export default defineComponent({
           const { data } = await OcurrenceRecord.getOcurrenceRecordByID(
             element
           );
-          const or = data.getOcurrenceRecordByID;
-          if (or.isVariation) {
-            this.entryRVariations.push(or);
-          } else {
-            this.entryROcurrences.push(or);
+          if (data.getOcurrenceRecordByID !== null) {
+            const or = {} as {
+              or: {
+                id: String;
+                source: String;
+                numAppearance: Number;
+                appearances: [];
+                isVariation: Boolean;
+                variationUF: String;
+              };
+              source: {};
+            };
+            or.or = data.getOcurrenceRecordByID;
+            const s = await Sources.getSourceByID(or.or.source);
+            or.source = s.data.getSourceByID;
+
+            if (or.or.isVariation) {
+              this.entryRVariations.push(or);
+            } else {
+              this.entryROcurrences.push(or);
+            }
           }
         }
         console.log('this.entryROcurrences', this.entryROcurrences);
@@ -374,6 +578,39 @@ export default defineComponent({
     },
     goEntries() {
       this.$router.push({ name: 'entries' });
+    },
+    handleSearch: (confirm) => {
+      confirm();
+    },
+    selectFilterOption(input: string, option: any) {
+      return (
+        option.props.value.name.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      );
+    },
+    handleReset: (clearFilters) => {
+      clearFilters();
+    },
+    roDetailsModalShowMethod(record) {
+      this.selectedOcurrenceRecord = record;
+      this.sourceType = record.source.type;
+      this.images = record.or.appearances;
+      this.sourceSupport = record.source.support;
+      this.sourceBloque = record.source.bloque;
+      this.ocurrenceRecordDetailsShow = true;
+    },
+    closeRODetailsModal() {
+      this.ocurrenceRecordDetailsShow = false;
+    },
+    closeRVDetailsModal() {
+      this.variationRecordDetailsModalShow = false;
+    },
+    rvDetailsModalShowMethod(record) {
+      this.selectedVariationRecord = record;
+      this.sourceType = record.source.type;
+      this.images = record.or.appearances;
+      this.sourceSupport = record.source.support;
+      this.sourceBloque = record.source.bloque;
+      this.variationRecordDetailsModalShow = true;
     },
   },
 });
