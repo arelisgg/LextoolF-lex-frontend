@@ -16,6 +16,7 @@ module.exports = {
     ecmaVersion: 2020,
   },
   rules: {
+    "no-unused-vars": "off",
     'no-console': process.env.NODE_ENV === 'production' ? 'off' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'off' : 'off',
     '@typescript-eslint/explicit-module-boundary-types': 0,
@@ -36,10 +37,11 @@ module.exports = {
     ],
     'prefer-const': 0,
   },
-  // overrides: [{
-  //   "files": ["*.js", "*.ts"],
-  //   "rules": {
-  //     "typescript/no-var-requires": "off"
-  //   }
-  // }]
+//  overrides: [{
+//    "files": ["*.js", "*.ts"],
+//    "rules": {
+//      "typescript/no-var-requires": "off",
+//      "typescript-eslint/no-unused-vars": "off"
+//    }
+//  }]
 };

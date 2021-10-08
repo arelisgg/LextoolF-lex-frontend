@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { store } from './../store/store';
 
 export const axiosClientPostImage = axios.create({
   baseURL: 'http://localhost:12000/files',

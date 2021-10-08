@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { store } from '@/store/store';
 import { ApolloLink } from 'apollo-boost';
 import { InMemoryCache } from 'apollo-cache-inmemory';
