@@ -22,7 +22,7 @@
   <a-table
     :data-source="entries"
     :columns="columns"
-    :row-key="(record) => record.id"
+    :row-key="(record) => record.entry.id"
     bordered
   >
     <template
@@ -66,9 +66,6 @@
     <template #filterIcon="filtered">
       <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
     </template>
-    <template #name="{ record }">
-      <span>{{ record.name }}</span>
-    </template>
     <template #operation="{ record }">
       <a-tooltip
         title="Seleccionar de la UF candidata"
@@ -76,14 +73,14 @@
       ></a-tooltip>
 
       <a-tooltip title="Detalles de la UF candidata " placement="bottom">
-        <a @click="ufDetailsModalShowMethod(record)">
+        <a @click="ufDetailsModalShowMethod(record.entry)">
           <EyeFilled
             :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
           />
         </a>
       </a-tooltip>
       <a-tooltip title="Editar" placement="bottom">
-        <a @click="goToEditEntryA(record)">
+        <a @click="goToEditEntryA(record.entry)">
           <EditFilled
             :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
           />
@@ -92,7 +89,7 @@
       <a-popconfirm
         v-if="entries.length"
         title="Seguro de Eliminar?"
-        @confirm="deleteUFByID(record.id)"
+        @confirm="deleteUFByID(record.entry.id)"
       >
         <a-tooltip title="Eliminar UF candidata" placement="bottom">
           <a>
@@ -122,6 +119,7 @@ import { defineComponent, ref } from 'vue';
 import { EntryA } from '@/graphql/modules/entryA/model.ts';
 import Table from 'ant-design-vue/lib/table';
 import EntryDetailsModal from './entryDetailsModal.vue';
+import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 
 export default defineComponent({
   components: {
@@ -145,7 +143,7 @@ export default defineComponent({
       columns: [
         {
           title: 'UF',
-          dataIndex: 'UF',
+          dataIndex: 'entry.UF',
           key: 'UF',
           width: 300,
           sorter: (a, b) => a.name.localeCompare(b.name),
@@ -154,14 +152,14 @@ export default defineComponent({
             filterIcon: 'filterIcon',
           },
           onFilter: (value, record) => {
-            return record.UF.toString()
+            return record.entry.UF.toString()
               .toLowerCase()
               .includes(value.toLowerCase());
           },
         },
         {
           title: 'Fuente',
-          dataIndex: 'source',
+          dataIndex: 'source.ref',
           key: 'source',
           width: 500,
           sorter: (a, b) => a.name.localeCompare(b.name),
@@ -170,7 +168,7 @@ export default defineComponent({
             filterIcon: 'filterIcon',
           },
           onFilter: (value, record) => {
-            return record.source
+            return record.source.ref
               .toString()
               .toLowerCase()
               .includes(value.toLowerCase());
@@ -187,8 +185,32 @@ export default defineComponent({
     };
   },
   async mounted() {
-    const { data } = await EntryA.findAllEntriesWithSourceRef();
-    this.entries = data.findAllEntriesWithSourceRef;
+    const { data } = await EntryA.getAllEntriesToDocument();
+    const entries = data.getAllEntriesToDocument;
+    for (let index = 0; index < entries.length; index++) {
+      const element = entries[index];
+      const entrySource = {} as {
+        entry: {
+          id: String;
+          UF: String;
+          lemma: String;
+          source: String;
+          letter: String;
+          context: String;
+          selected: Boolean;
+          criteria: String;
+          included: String;
+          frecuency: String;
+          documentation: [];
+        };
+        source: {};
+      };
+      entrySource.entry = element;
+      const s = await Sources.getSourceByID(element.source);
+      entrySource.source = s.data.getSourceByID;
+      this.entries.push(entrySource);
+    }
+    console.log();
   },
   methods: {
     async deleteUFByID(id) {
@@ -196,11 +218,11 @@ export default defineComponent({
       let found = false;
       for (index; index < this.entries.length && !found; index++) {
         const element = this.entries[index];
-        if (element.id === id) {
+        if (element.entry.id === id) {
           found = true;
         }
       }
-      this.entries = this.entries.filter((item) => item.id !== id);
+      this.entries = this.entries.filter((item) => item.entry.id !== id);
       await EntryA.deleteEntryByID(id);
     },
     handleSearch: (confirm) => {

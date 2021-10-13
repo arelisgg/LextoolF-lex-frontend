@@ -10,6 +10,9 @@ export const findAllEntriesQuery = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
     }
   }
 `;
@@ -24,7 +27,9 @@ export const findAllEntriesWithDocsQuery = gql`
       UF
       source
       selected
-      id
+      criteria
+      included
+      frecuency
       documentation
     }
   }
@@ -40,6 +45,9 @@ export const getEntryByIDWithDocsQuery = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
       documentation
     }
   }
@@ -55,6 +63,9 @@ export const getEntryByIDQuery = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
     }
   }
 `;
@@ -69,6 +80,9 @@ export const getAllEntriesBySourceIDQuery = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
     }
   }
 `;
@@ -83,6 +97,81 @@ export const findAllEntriesWithSourceRefQuery = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
+    }
+  }
+`;
+
+export const getAllExcludedEntriesQuery = gql`
+  query getAllExcludedEntries {
+    getAllExcludedEntries {
+      id
+      lemma
+      letter
+      context
+      UF
+      source
+      selected
+      criteria
+      included
+      frecuency
+      documentation
+    }
+  }
+`;
+
+export const getAllIncludedEntriesQuery = gql`
+  query getAllIncludedEntries {
+    getAllIncludedEntries {
+      id
+      lemma
+      letter
+      context
+      UF
+      source
+      selected
+      criteria
+      included
+      frecuency
+      documentation
+    }
+  }
+`;
+
+export const getAllEntriesToSelectQuery = gql`
+  query getAllEntriesToSelect {
+    getAllEntriesToSelect {
+      id
+      lemma
+      letter
+      context
+      UF
+      source
+      selected
+      criteria
+      included
+      frecuency
+      documentation
+    }
+  }
+`;
+
+export const getAllEntriesToDocumentQuery = gql`
+  query getAllEntriesToDocument {
+    getAllEntriesToDocument {
+      id
+      lemma
+      letter
+      context
+      UF
+      source
+      selected
+      criteria
+      included
+      frecuency
+      documentation
     }
   }
 `;

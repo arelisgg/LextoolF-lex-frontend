@@ -20,7 +20,7 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   methods: {
     onSources() {
-      this.$router.push('sources');
+      this.$router.push('firstExtraction');
     },
   },
 });

@@ -118,10 +118,10 @@
       <a-table
         :data-source="record.nestedEntryData"
         :columns="entryColumns"
-        :row-key="(record) => record.source.id"
+        :row-key="(record) => record.id"
         :pagination="false"
       >
-        <template #operation>
+        <template #operation="{ record }">
           <a-tooltip title="Detalles de la Entrada" placement="bottom">
             <a @click="entryDetailsModalShowMethod(record)">
               <EyeFilled
@@ -304,8 +304,8 @@ export default defineComponent({
     };
   },
   async mounted() {
-    const { data } = await Sources.findAllSources();
-    const sources = data.findAllSources;
+    const { data } = await Sources.findAllExtractionSources();
+    const sources = data.findAllExtractionSources;
     for (let i = 0; i < sources.length; i++) {
       const e = sources[i];
       const nestedObject = {} as { source: {}; nestedEntryData: [] };
@@ -324,8 +324,14 @@ export default defineComponent({
       });
     },
     async deleteSourceByID(id) {
-      await Sources.deleteSourceByID(id);
-      this.sources = this.sources.filter((item) => item.id !== id);
+      const entry = await EntryA.getAllEntriesBySourceID(id);
+      const entriesOfTheSource = entry.data.getAllEntriesBySourceID;
+      for (let index = 0; index < entriesOfTheSource.length; index++) {
+        const element = entriesOfTheSource[index];
+        await EntryA.deleteEntryByID(element.id);
+      }
+      let s = await Sources.deleteSourceByID(id);
+      this.nestedData = this.nestedData.filter((item) => item.source.id !== id);
     },
     handleSearch: (confirm) => {
       confirm();
@@ -362,10 +368,12 @@ export default defineComponent({
       console.log('e', e);
     },
     entryDetailsModalShowMethod(entry) {
+      console.log('Entry esta:', entry);
       this.selectedEntry = entry;
+      console.log('Entry esta:', entry);
+      console.log('selectedEntry esta:', this.selectedEntry);
       this.fileType = this.selectedEntry.context.split('_')[0];
       this.entryDetailsModalShow = true;
-      console.log('selectedEntry esta:', this.selectedEntry);
     },
     closeEntryDetailsModal() {
       this.entryDetailsModalShow = false;

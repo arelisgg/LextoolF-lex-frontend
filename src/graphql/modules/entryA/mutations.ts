@@ -10,6 +10,9 @@ export const deleteEntryByIDMutation = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
     }
   }
 `;
@@ -24,6 +27,9 @@ export const deleteEntryDocByIDMutation = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
       documentation
     }
   }
@@ -39,6 +45,9 @@ export const createEntryMutation = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
     }
   }
 `;
@@ -53,6 +62,9 @@ export const updateEntryByIDMutation = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
       documentation
     }
   }
@@ -68,6 +80,27 @@ export const updateEntryDocumentationMutation = gql`
       UF
       source
       selected
+      criteria
+      included
+      frecuency
+      documentation
+    }
+  }
+`;
+
+export const updateEntryFrecuencyMutation = gql`
+  mutation updateEntryFrecuency($entryID: String!) {
+    updateEntryFrecuency(entryID: $entryID) {
+      id
+      lemma
+      letter
+      context
+      UF
+      source
+      selected
+      criteria
+      included
+      frecuency
       documentation
     }
   }

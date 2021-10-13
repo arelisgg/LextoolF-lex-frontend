@@ -739,7 +739,7 @@ export default defineComponent({
       stage: '',
 
       // linguisticas libro o prensa
-      bloque: '',
+      bloque: 'Ficción',
       theme: '',
       provice_p: '',
       session_p: '',
@@ -779,6 +779,9 @@ export default defineComponent({
       letter: '',
       context: '',
       selected: false,
+      criteria: '',
+      included: '',
+      frecuency: '',
     };
     const addGenreModalShow = false;
     const addThemeModalShow = false;
@@ -876,7 +879,7 @@ export default defineComponent({
       const s = await this.createSource();
       const sourceID = s.data.createSource.id;
       this.createEntryA(sourceID);
-      this.$router.push({ name: 'sources' });
+      this.$router.push({ name: 'firstExtraction' });
     },
     radioSelect(e) {
       this.radio = e.target.value;
@@ -1048,7 +1051,7 @@ export default defineComponent({
       }
     },
     goBack() {
-      this.$router.push({ name: 'sources' });
+      this.$router.push({ name: 'firstExtraction' });
     },
 
     // fuente******

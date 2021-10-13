@@ -1,5 +1,10 @@
 import { apolloQuery, apolloMutate } from '@/graphql/apollo';
-import { findAllSourcesQuery, getSourceByIDQuery } from './querys';
+import {
+  findAllSourcesQuery,
+  getSourceByIDQuery,
+  findAllDocumentationtionSourcesQuery,
+  findAllExtractionSourcesQuery,
+} from './querys';
 import { FetchPolicy, apolloClientA } from '@/graphql/apolloProvider';
 import {
   createSourceMutation,
@@ -11,6 +16,24 @@ export class Sources {
   static findAllSources() {
     return apolloQuery(
       findAllSourcesQuery,
+      null,
+      FetchPolicy.network_only,
+      apolloClientA
+    );
+  }
+
+  static findAllDocumentationtionSources() {
+    return apolloQuery(
+      findAllDocumentationtionSourcesQuery,
+      null,
+      FetchPolicy.network_only,
+      apolloClientA
+    );
+  }
+
+  static findAllExtractionSources() {
+    return apolloQuery(
+      findAllExtractionSourcesQuery,
       null,
       FetchPolicy.network_only,
       apolloClientA

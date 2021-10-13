@@ -6,6 +6,10 @@ import {
   findAllEntriesWithSourceRefQuery,
   findAllEntriesWithDocsQuery,
   getEntryByIDWithDocsQuery,
+  getAllEntriesToDocumentQuery,
+  getAllEntriesToSelectQuery,
+  getAllExcludedEntriesQuery,
+  getAllIncludedEntriesQuery,
 } from './querys';
 import { FetchPolicy, apolloClientA } from '@/graphql/apolloProvider';
 import {
@@ -14,6 +18,7 @@ import {
   updateEntryByIDMutation,
   updateEntryDocumentationMutation,
   deleteEntryDocByIDMutation,
+  updateEntryFrecuencyMutation,
 } from './mutations';
 
 export class EntryA {
@@ -117,6 +122,52 @@ export class EntryA {
       { entryID, orID },
       null,
       null,
+      apolloClientA
+    );
+  }
+
+  static updateEntryFrecuency(entryID: String) {
+    return apolloMutate(
+      updateEntryFrecuencyMutation,
+      { entryID: entryID },
+      null,
+      null,
+      apolloClientA
+    );
+  }
+
+  static getAllExcludedEntries() {
+    return apolloQuery(
+      getAllExcludedEntriesQuery,
+      null,
+      FetchPolicy.network_only,
+      apolloClientA
+    );
+  }
+
+  static getAllIncludedEntries() {
+    return apolloQuery(
+      getAllIncludedEntriesQuery,
+      null,
+      FetchPolicy.network_only,
+      apolloClientA
+    );
+  }
+
+  static getAllEntriesToSelect() {
+    return apolloQuery(
+      getAllEntriesToSelectQuery,
+      null,
+      FetchPolicy.network_only,
+      apolloClientA
+    );
+  }
+
+  static getAllEntriesToDocument() {
+    return apolloQuery(
+      getAllEntriesToDocumentQuery,
+      null,
+      FetchPolicy.network_only,
       apolloClientA
     );
   }

@@ -163,6 +163,9 @@ export default defineComponent({
       letter: '',
       context: '',
       selected: false,
+      criteria: '',
+      included: '',
+      frecuency: '',
     };
     return {
       image: {

@@ -553,10 +553,10 @@ export default defineComponent({
       }
       console.log('this.source', this.source);
       Sources.createSource(this.source);
-      this.$router.push({ name: 'sources' });
+      this.$router.push({ name: 'firstExtraction' });
     },
     goBack() {
-      this.$router.push({ name: 'sources' });
+      this.$router.push({ name: 'firstExtraction' });
     },
     handleOptionsChange(value) {
       console.log('valueeeeeeeeeeee', value);

@@ -21,6 +21,8 @@ const newVariationRecord = () =>
 const firstEntrySource = () =>
   import('@/components/pages/entryA/firstEntrySource.vue');
 const editEntryA = () => import('@/components/pages/entryA/editEntryA.vue');
+const entrySelection = () =>
+  import('@/components/pages/entryA/entrySelection.vue');
 
 export const SiteRoutes: RouteRecordRaw[] & any = [
   {
@@ -30,9 +32,9 @@ export const SiteRoutes: RouteRecordRaw[] & any = [
     component: home,
   },
   {
-    name: 'sources',
+    name: 'firstExtraction',
     exact: true,
-    path: 'sources',
+    path: 'firstExtraction',
     component: sources,
   },
   {
@@ -106,5 +108,11 @@ export const SiteRoutes: RouteRecordRaw[] & any = [
     exact: true,
     path: 'newVariationRecord/:id',
     component: newVariationRecord,
+  },
+  {
+    name: 'entrySelection',
+    exact: true,
+    path: 'entrySelection',
+    component: entrySelection,
   },
 ];

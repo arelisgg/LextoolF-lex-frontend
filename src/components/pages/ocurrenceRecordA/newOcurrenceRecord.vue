@@ -841,7 +841,12 @@ export default defineComponent({
       const e = await EntryA.getEntryByIDWithDocs(id);
       let newEntry = e.data.getEntryByIDWithDocs;
       newEntry.documentation.push(or.id);
-      await EntryA.updateEntryDocumentation(newEntry);
+      let updated = await EntryA.updateEntryDocumentation(newEntry);
+      const eu = updated.data.updateEntryDocumentation;
+      let updatedID = eu.id;
+      console.log('updatedID', updatedID);
+      let u = await EntryA.updateEntryFrecuency(updatedID);
+      console.log('u', u.data.updateEntryFrecuency);
     },
     goBack() {
       this.$router.push({ name: 'documentationTask' });

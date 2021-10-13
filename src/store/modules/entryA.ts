@@ -5,5 +5,8 @@ export class EntryAStore {
   UF: String;
   source: String;
   selected: Boolean;
+  criteria: String;
+  included: String;
+  frecuency: String;
   documentation: [String];
 }

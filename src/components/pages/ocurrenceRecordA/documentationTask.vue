@@ -472,8 +472,8 @@ export default defineComponent({
     };
   },
   async mounted() {
-    const { data } = await EntryA.findAllEntriesWithDocs();
-    this.canditateUFs = data.findAllEntriesWithDocs;
+    const { data } = await EntryA.getAllEntriesToDocument();
+    this.canditateUFs = data.getAllEntriesToDocument;
   },
   methods: {
     async deleteRvByID(record) {

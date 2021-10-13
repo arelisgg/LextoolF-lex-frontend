@@ -55,9 +55,30 @@ export default defineComponent({
   data: () => ({
     links: [
       {
+        text: 'Diccionario Fraseológico',
+        icon: 'ion-ios-book',
+        to: { name: 'entries' },
+      },
+      {
         text: 'Proyecto de Lemario',
         icon: 'ion-ios-book',
-        to: { name: 'sources' },
+        children: [
+          {
+            text: 'Extracción de UF',
+            icon: 'ion-ios-book',
+            to: { name: 'firstExtraction' },
+          },
+          {
+            text: 'Documentar UF',
+            icon: 'ion-ios-book',
+            to: { name: 'entries' },
+          },
+          {
+            text: 'Selección de UF',
+            icon: 'ion-ios-book',
+            to: { name: 'entrySelection' },
+          },
+        ],
       },
     ],
   }),

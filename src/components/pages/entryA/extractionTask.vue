@@ -132,7 +132,7 @@
   </a-table>
   <br />
   <div style="text-align: right">
-    <a-button key="back" @click="goSources" type="primary">Finalizar</a-button>
+    <a-button key="back" type="primary" @click="goSources">Finalizar</a-button>
   </div>
   <entry-details-modal
     v-model:visible="entryDetailsModalShow"
@@ -238,7 +238,7 @@ export default defineComponent({
       this.entryDetailsModalShow = false;
     },
     goSources() {
-      this.$router.push({ name: 'sources' });
+      this.$router.push({ name: 'firstExtraction' });
     },
     goToEditEntryA(selectedEntry) {
       this.$router.push({
