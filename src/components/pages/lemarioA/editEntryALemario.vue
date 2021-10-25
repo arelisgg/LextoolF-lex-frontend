@@ -11,6 +11,33 @@
     >
       <a-input v-model:value="entryToEdit.UF"></a-input>
     </a-form-item>
+    <a-form-item
+      label="Seleccione una opción"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
+    >
+      <a-radio-group
+        :default-value="1"
+        button-style="solid"
+        @change="radioSelect"
+      >
+        <a-radio-button :value="1">Incluir</a-radio-button>
+        <a-radio-button :value="2">Excluir</a-radio-button>
+      </a-radio-group>
+    </a-form-item>
+    <a-form-item
+      ref="criteria"
+      label="Anotaciones"
+      name="criteria"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
+    >
+      <a-textarea
+        v-model:value="entryToEdit.criteria"
+        placeholder="Especifique los Criterios que tuvo en cuenta para incluir o excluir la UF"
+        allow-clear
+      />
+    </a-form-item>
     <div v-show="selectedSource.subType === 'Escrita'">
       <croppie-modal @crop="crop"></croppie-modal>
       <div v-if="editImageFile">
@@ -194,7 +221,7 @@ import { EntryA } from '@/graphql/modules/entryA/model';
 import { MINIO_URL_A as minio_url } from '@/utils/minIO.ts';
 import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 
-import CroppieModal from './VueCroppie/CroppieModal.vue';
+import CroppieModal from '../entryA/VueCroppie/CroppieModal.vue';
 import { axiosClientPostImage } from '@/plugins/axios';
 
 export default defineComponent({
@@ -264,6 +291,8 @@ export default defineComponent({
       selectedSource: {},
       editFile: false,
       editImageFile: false,
+      radio: '',
+      btnText: '',
     };
   },
   async mounted() {
@@ -297,7 +326,19 @@ export default defineComponent({
       this.entryToEdit.source = this.selectedSource.id;
       EntryA.updateEntryByID(this.entryToEdit);
       console.log('this.entryToEdit', this.entryToEdit);
-      this.$router.push({ name: 'entries' });
+      this.$router.push({ name: 'lemario' });
+    },
+    radioSelect(e) {
+      this.radio = e.target.value;
+      if (this.radio === 1) {
+        this.entryToEdit.included = 'Incluida';
+        this.btnText = 'Incluir';
+      }
+      if (this.radio === 2) {
+        this.entryToEdit.included = 'Excluida';
+        this.btnText = 'Excluir';
+      }
+      console.log('this.entryToEdit', this.entryToEdit);
     },
     //file Videos
     onFileSelectedV(event) {

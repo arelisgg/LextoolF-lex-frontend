@@ -5,10 +5,10 @@ export const deleteDictionaryAByIDMutation = gql`
     deleteDictionaryByID(dictionaryID: $dictionaryID) {
       id
       name
-      reference
       description
       state
-      lemario
+      image
+      dictionaryType
     }
   }
 `;
@@ -18,86 +18,10 @@ export const createDictionaryAMutation = gql`
     createDictionary(createdDictionary: $createdDictionary) {
       id
       name
-      reference
-      sources {
-        id
-        name
-        ref
-        file
-        letters
-      }
       description
       state
-    }
-  }
-`;
-
-export const updateDictionaryAByIDMutation = gql`
-  mutation updateDictionaryByID($newDictionary: EditedDictionaryType!) {
-    updateDictionaryByID(newDictionary: $newDictionary) {
-      id
-      name
-      reference
-      sources {
-        id
-        name
-        ref
-        file
-        letters
-      }
-      description
-      state
-    }
-  }
-`;
-
-export const addSourcesToDictionaryAMutation = gql`
-  mutation addSourcesToDictionary(
-    $sourcesIDs: [String]!
-    $dictionaryID: String!
-  ) {
-    addSourcesToDictionary(
-      sourcesIDs: $sourcesIDs
-      dictionaryID: $dictionaryID
-    ) {
-      id
-      name
-      reference
-      sources {
-        id
-        name
-        ref
-        file
-        letters
-      }
-      description
-      state
-    }
-  }
-`;
-
-export const createLemarioByDictionaryIDMutation = gql`
-  mutation createLemarioByDictionaryID(
-    $dictionaryID: String!
-    $newLemario: NewLemarioType!
-  ) {
-    createLemarioByDictionaryID(
-      dictionaryID: $dictionaryID
-      newLemario: $newLemario
-    ) {
-      id
-      name
-      reference
-      description
-      state
-      sources {
-        id
-        name
-        ref
-        file
-        letters
-      }
-      lemario
+      image
+      dictionaryType
     }
   }
 `;

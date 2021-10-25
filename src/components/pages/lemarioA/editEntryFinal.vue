@@ -1,5 +1,5 @@
 <template>
-  <h4>Editar Unidad Fraseológica Candidata</h4>
+  <h4>Editar Unidad Fraseológica</h4>
   <br />
   <a-form ref="formRef" :model="entryToEdit" :rules="rules">
     <a-form-item
@@ -10,6 +10,53 @@
       :wrapper-col="wrapperCol"
     >
       <a-input v-model:value="entryToEdit.UF"></a-input>
+    </a-form-item>
+    <a-form-item
+      v-for="(lemma, index) in entryToEdit.lemma"
+      :key="index"
+      :label="'Lema ' + (index + 1)"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
+    >
+      <a-input
+        v-model:value="entryToEdit.lemma[index].lemma"
+        placeholder="Lemma de la Unidad Fraseológica"
+        style="width: 300px; margin-right: 10px"
+      ></a-input>
+      <PlusOutlined
+        v-if="entryToEdit.lemma.length - 1 === index"
+        class="dynamic-add-button"
+        :disabled="entryToEdit.lemma.length === 1"
+        :style="{ color: '#1890ff' }"
+        @click="addLemma"
+      />
+      <MinusCircleFilled
+        v-if="entryToEdit.lemma.length > 1"
+        class="dynamic-delete-button"
+        :disabled="entryToEdit.lemma.length === 1"
+        :style="{ color: 'red', marginLeft: '5px' }"
+        @click="removeLemma(lemma)"
+      />
+    </a-form-item>
+    <a-form-item
+      ref="letter"
+      label="Letras"
+      :label-col="labelCol"
+      :wrapper-col="wrapperCol"
+    >
+      <div class="container ml-4 w-100">
+        <a-transfer
+          :titles="['Sin agregar', 'Agregadas']"
+          :data-source="letters"
+          :render="(letter) => letter.title"
+          :filter-option="filterOptionLettersTransfer"
+          show-search
+          :target-keys="entryToEdit.letter"
+          :locale="transferLocale"
+          class="w-100"
+          @change="handleChangeLettersTransfer"
+        ></a-transfer>
+      </div>
     </a-form-item>
     <div v-show="selectedSource.subType === 'Escrita'">
       <croppie-modal @crop="crop"></croppie-modal>
@@ -194,7 +241,7 @@ import { EntryA } from '@/graphql/modules/entryA/model';
 import { MINIO_URL_A as minio_url } from '@/utils/minIO.ts';
 import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 
-import CroppieModal from './VueCroppie/CroppieModal.vue';
+import CroppieModal from '../entryA/VueCroppie/CroppieModal.vue';
 import { axiosClientPostImage } from '@/plugins/axios';
 
 export default defineComponent({
@@ -240,7 +287,46 @@ export default defineComponent({
       included: '',
       documentation: [],
     };
+    const transferLocale = {
+      itemUnit: '',
+      itemsUnit: '',
+      notFoundContent: 'No hay letras',
+      searchPlaceholder: 'Buscar Letra',
+    };
+    const letters = [
+      { title: 'A', key: 'A' },
+      { title: 'B', key: 'B' },
+      { title: 'C', key: 'C' },
+      { title: 'D', key: 'D' },
+      { title: 'E', key: 'E' },
+      { title: 'F', key: 'F' },
+      { title: 'G', key: 'G' },
+      { title: 'H', key: 'H' },
+      { title: 'I', key: 'I' },
+      { title: 'J', key: 'J' },
+      { title: 'K', key: 'K' },
+      { title: 'L', key: 'L' },
+      { title: 'M', key: 'M' },
+      { title: 'N', key: 'N' },
+      { title: 'Ñ', key: 'Ñ' },
+      { title: 'O', key: 'O' },
+      { title: 'P', key: 'P' },
+      { title: 'Q', key: 'Q' },
+      { title: 'R', key: 'R' },
+      { title: 'S', key: 'S' },
+      { title: 'T', key: 'T' },
+      { title: 'U', key: 'U' },
+      { title: 'V', key: 'V' },
+      { title: 'W', key: 'W' },
+      { title: 'X', key: 'X' },
+      { title: 'Y', key: 'Y' },
+      { title: 'Z', key: 'Z' },
+    ];
+    const selectedLetters = [];
     return {
+      selectedLetters,
+      letters,
+      transferLocale,
       image: {
         base64: null,
         file: null,
@@ -278,6 +364,21 @@ export default defineComponent({
     this.selectedSource = s.data.getSourceByID;
   },
   methods: {
+    handleChangeLettersTransfer(targetKeys) {
+      this.entryToEdit.letter = targetKeys;
+    },
+    filterOptionLettersTransfer(inputValue, option) {
+      return option.title.toLowerCase().indexOf(inputValue.toLowerCase()) > -1;
+    },
+    removeLemma(lemma) {
+      let index = this.entryToEdit.lemma.indexOf(lemma);
+      if (index !== -1) {
+        this.entryToEdit.lemma.splice(index, 1);
+      }
+    },
+    addLemma() {
+      this.entryToEdit.lemma.push({ lemma: '' });
+    },
     editEntry() {
       console.log('this.entryToEdit', this.entryToEdit);
       if (this.selectedFile || this.editFile) {
@@ -297,7 +398,7 @@ export default defineComponent({
       this.entryToEdit.source = this.selectedSource.id;
       EntryA.updateEntryByID(this.entryToEdit);
       console.log('this.entryToEdit', this.entryToEdit);
-      this.$router.push({ name: 'entries' });
+      this.$router.push({ name: 'lemarioFinal' });
     },
     //file Videos
     onFileSelectedV(event) {

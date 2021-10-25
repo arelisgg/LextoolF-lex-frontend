@@ -34,12 +34,25 @@ export const editOcurrenceRecordMutation = gql`
   mutation editOcurrenceRecord($newOcurrenceRecord: NewOcurrenceRecordType!) {
     editOcurrenceRecord(newOcurrenceRecord: $newOcurrenceRecord) {
       id
-      corpus_treasure
+      source
       numAppearance
-      numSources
       appearances {
         useContext
-        contextSource
+      }
+      isVariation
+      variationUF
+    }
+  }
+`;
+
+export const editORAppearancesMutation = gql`
+  mutation editORAppearances($newOcurrenceRecord: NewOcurrenceRecordType!) {
+    editORAppearances(newOcurrenceRecord: $newOcurrenceRecord) {
+      id
+      source
+      numAppearance
+      appearances {
+        useContext
       }
       isVariation
       variationUF

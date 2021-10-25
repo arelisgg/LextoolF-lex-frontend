@@ -242,7 +242,7 @@ export default defineComponent({
     },
     goToEditEntryA(selectedEntry) {
       this.$router.push({
-        name: 'editEntryA',
+        name: 'editEntryAExtracted',
         params: {
           id: selectedEntry.id,
         },

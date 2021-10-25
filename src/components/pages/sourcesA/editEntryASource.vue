@@ -194,7 +194,7 @@ import { EntryA } from '@/graphql/modules/entryA/model';
 import { MINIO_URL_A as minio_url } from '@/utils/minIO.ts';
 import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 
-import CroppieModal from './VueCroppie/CroppieModal.vue';
+import CroppieModal from '../entryA/VueCroppie/CroppieModal.vue';
 import { axiosClientPostImage } from '@/plugins/axios';
 
 export default defineComponent({
@@ -297,7 +297,7 @@ export default defineComponent({
       this.entryToEdit.source = this.selectedSource.id;
       EntryA.updateEntryByID(this.entryToEdit);
       console.log('this.entryToEdit', this.entryToEdit);
-      this.$router.push({ name: 'entries' });
+      this.$router.push({ name: 'sources' });
     },
     //file Videos
     onFileSelectedV(event) {

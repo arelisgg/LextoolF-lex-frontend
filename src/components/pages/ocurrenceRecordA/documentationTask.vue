@@ -88,7 +88,7 @@
                   title="Editar del estudio fraseologico"
                   placement="bottom"
                 >
-                  <a>
+                  <a @click="selectToEditRO(record)">
                     <EditFilled
                       :style="{
                         fontSize: '20px',
@@ -233,10 +233,10 @@
               </template>
               <template #operation="{ record }">
                 <a-tooltip
-                  title="Editar del estudio fraseologico"
+                  title="Editar del Registro de la Variación"
                   placement="bottom"
                 >
-                  <a>
+                  <a @click="selectToEditRV(record)">
                     <EditFilled
                       :style="{
                         fontSize: '20px',
@@ -296,6 +296,11 @@
     :selected-ocurrence-record="selectedOcurrenceRecord"
     @close-modal="closeRODetailsModal"
   ></ocurrence-record-details-modal>
+  <select-to-edit
+    v-model:visible="selectToEditShow"
+    @select-to-edit="selectToEdit"
+    @close-modal="closeSelectToEditModal"
+  ></select-to-edit>
 </template>
 <script lang="ts">
 import {
@@ -311,6 +316,7 @@ import VariationRecordDetailsModal from './variationRecordDetailsModal.vue';
 import { EntryA } from '@/graphql/modules/entryA/model.ts';
 import { OcurrenceRecord } from '@/graphql/modules/ocurrenceRecord/model';
 import { Sources } from '@/graphql/modules/sourcesA/model.ts';
+import SelectToEdit from './edit/selectToEdit.vue';
 
 export default defineComponent({
   components: {
@@ -321,15 +327,19 @@ export default defineComponent({
     SearchOutlined,
     'ocurrence-record-details-modal': OcurrenceRecordDetailsModal,
     'variation-record-details-modal': VariationRecordDetailsModal,
+    'select-to-edit': SelectToEdit,
   },
   data() {
     const entrySelected = {
-      lemma: '',
-      letter: '',
+      lemma: [],
+      letter: [],
       context: '',
       UF: '',
       source: '',
       selected: false,
+      criteria: '',
+      frecuency: '',
+      included: '',
       documentation: [],
     };
     const columnsO = [
@@ -446,6 +456,7 @@ export default defineComponent({
       },
     ];
     const ocurrenceRecordDetailsShow = false;
+    const selectToEditShow = false;
     const variationRecordDetailsModalShow = false;
     const selectedOcurrenceRecord = {};
     const selectedVariationRecord = {};
@@ -461,6 +472,7 @@ export default defineComponent({
       sourceBloque,
       columnsO,
       columnsV,
+      selectToEditShow,
       ocurrenceRecordDetailsShow,
       variationRecordDetailsModalShow,
       selectedOcurrenceRecord,
@@ -611,6 +623,80 @@ export default defineComponent({
       this.sourceSupport = record.source.support;
       this.sourceBloque = record.source.bloque;
       this.variationRecordDetailsModalShow = true;
+    },
+    selectToEditRO(selectedRO) {
+      console.log('selectedRO', selectedRO);
+      this.selectedOcurrenceRecord = selectedRO;
+      this.selectToEditShow = true;
+    },
+    selectToEditRV(selectedRV) {
+      console.log('selectedRV', selectedRV);
+      this.selectedOcurrenceRecord = selectedRV;
+      this.selectToEditShow = true;
+    },
+    closeSelectToEditModal() {
+      this.selectToEditShow = false;
+    },
+    async selectToEdit(selectedOption) {
+      console.log('selectedOption', selectedOption);
+      const s = await Sources.getSourceByID(
+        this.selectedOcurrenceRecord.source.id
+      );
+      let source = s.data.getSourceByID;
+      console.log('source', source);
+      let sourceType = source.type;
+      let sourceSubType = source.subType;
+      this.closeSelectToEditModal();
+      ////// edit appearnces
+      if (
+        selectedOption === 'appearances' &&
+        this.selectedOcurrenceRecord.or.isVariation
+      ) {
+        this.$router.push({
+          name: 'editVRAppearances',
+          params: {
+            id: this.selectedOcurrenceRecord.or.id,
+          },
+        });
+      }
+      if (
+        selectedOption === 'appearances' &&
+        !this.selectedOcurrenceRecord.or.isVariation
+      ) {
+        this.$router.push({
+          name: 'editORAppearances',
+          params: {
+            id: this.selectedOcurrenceRecord.or.id,
+          },
+        });
+      }
+      //// edit source
+      if (selectedOption === 'source') {
+        if (sourceSubType === 'Escrita') {
+          this.$router.push({
+            name: 'editSourceEscrita',
+            params: {
+              id: source.id,
+            },
+          });
+        }
+        if (sourceSubType === 'Oral') {
+          this.$router.push({
+            name: 'editSourceOral',
+            params: {
+              id: source.id,
+            },
+          });
+        }
+        if (sourceType === 'Metalinguística') {
+          this.$router.push({
+            name: 'editSourceDictionary',
+            params: {
+              id: source.id,
+            },
+          });
+        }
+      }
     },
   },
 });

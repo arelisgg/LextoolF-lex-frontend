@@ -100,9 +100,16 @@
           />
         </a>
       </a-tooltip>
+      <a-tooltip title="Editar Fuente" placement="bottom">
+        <a @click="goToEditSource(record.source)">
+          <EditFilled
+            :style="{ fontSize: '20px', color: '#08c', margin: '5px' }"
+          />
+        </a>
+      </a-tooltip>
       <a-popconfirm
         v-if="nestedData.length"
-        title="Seguro de Eliminar?"
+        title="Si elimina la Fuente se eliminaran las entradas extraídas de esta.¿Seguro de Eliminar?"
         @confirm="deleteSourceByID(record.source.id)"
       >
         <a-tooltip title="Eliminar de la fuente" placement="bottom">
@@ -273,7 +280,7 @@ export default defineComponent({
         },
         {
           key: 'operation',
-          width: 70,
+          width: 100,
           slots: { customRender: 'operation' },
         },
       ],
@@ -331,7 +338,18 @@ export default defineComponent({
         await EntryA.deleteEntryByID(element.id);
       }
       let s = await Sources.deleteSourceByID(id);
-      this.nestedData = this.nestedData.filter((item) => item.source.id !== id);
+      if (s) {
+        this.$message.success(
+          'Se ha eliminado la Fuente y las Entradas extraídas de ella',
+          10
+        );
+
+        this.nestedData = this.nestedData.filter(
+          (item) => item.source.id !== id
+        );
+      } else {
+        this.$message.error('Error, algo salió mal', 10);
+      }
     },
     handleSearch: (confirm) => {
       confirm();
@@ -380,11 +398,38 @@ export default defineComponent({
     },
     goToEditEntryA(selectedEntry) {
       this.$router.push({
-        name: 'editEntryA',
+        name: 'editEntryASource',
         params: {
           id: selectedEntry.id,
         },
       });
+    },
+    goToEditSource(selectedSource) {
+      console.log('selectedSource', selectedSource);
+      if (selectedSource.subType === 'Escrita') {
+        this.$router.push({
+          name: 'editSourceEscrita',
+          params: {
+            id: selectedSource.id,
+          },
+        });
+      }
+      if (selectedSource.subType === 'Oral') {
+        this.$router.push({
+          name: 'editSourceOral',
+          params: {
+            id: selectedSource.id,
+          },
+        });
+      }
+      if (selectedSource.type === 'Metalinguística') {
+        this.$router.push({
+          name: 'editSourceDictionary',
+          params: {
+            id: selectedSource.id,
+          },
+        });
+      }
     },
   },
 });

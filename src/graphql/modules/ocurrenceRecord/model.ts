@@ -8,6 +8,7 @@ import {
   createOcurrenceRecordMutation,
   deleteOcurrenceRecordByIDMutation,
   editOcurrenceRecordMutation,
+  editORAppearancesMutation,
 } from './mutations';
 
 export class OcurrenceRecord {
@@ -42,6 +43,16 @@ export class OcurrenceRecord {
   static editOcurrenceRecord(newOcurrenceRecord: any) {
     return apolloMutate(
       editOcurrenceRecordMutation,
+      { newOcurrenceRecord: newOcurrenceRecord },
+      null,
+      null,
+      apolloClientA
+    );
+  }
+
+  static editORAppearances(newOcurrenceRecord: any) {
+    return apolloMutate(
+      editORAppearancesMutation,
       { newOcurrenceRecord: newOcurrenceRecord },
       null,
       null,

@@ -1,6 +1,6 @@
 export class EntryAStore {
-  lemma: String;
-  letter: String;
+  lemma: [Lemma];
+  letter: [String];
   context: String;
   UF: String;
   source: String;
@@ -9,4 +9,8 @@ export class EntryAStore {
   included: String;
   frecuency: String;
   documentation: [String];
+}
+
+export class Lemma {
+  lemma: String;
 }

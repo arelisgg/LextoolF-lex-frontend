@@ -3,6 +3,21 @@
     <template #title>
       <h4>Seleccionar Unidades Fraseológicas Candidatas</h4>
     </template>
+    <template #extra>
+      <a-tooltip
+        title="Finalizar Tarea de Selección Unidades Fraseológicas Candidatas"
+        placement="bottom"
+      >
+        <a-button
+          key="back"
+          type="primary"
+          style="text-align: right"
+          @click="goBack"
+        >
+          Finalizar
+        </a-button>
+      </a-tooltip>
+    </template>
   </a-page-header>
   <a-space direction="horizontal" align="start">
     <div class="dropdown">
@@ -74,7 +89,7 @@
         </a-form>
         <a-collapse v-model:activeKey="activeKey" :bordered="false">
           <a-collapse-panel key="1" header="Información del Diccionario">
-            <p>Diccionario</p>
+            <dictionary></dictionary>
           </a-collapse-panel>
           <a-collapse-panel key="2" header="Información de la Fuente">
             <a-descriptions>
@@ -209,13 +224,13 @@ import {
   EditFilled,
   SearchOutlined,
 } from '@ant-design/icons-vue';
-import { notification } from 'ant-design-vue';
 import { defineComponent, ref, watch } from 'vue';
 import { EntryA } from '@/graphql/modules/entryA/model.ts';
 import { Sources } from '@/graphql/modules/sourcesA/model.ts';
 import { OcurrenceRecord } from '@/graphql/modules/ocurrenceRecord/model';
 import CarrouselImages from '../ocurrenceRecordA/carrouselImages.vue';
 import { MINIO_URL_A as minio_url } from '@/utils/minIO.ts';
+import Dictionary from '../dictionaryA/dictionaryA.vue';
 
 export default defineComponent({
   components: {
@@ -226,6 +241,7 @@ export default defineComponent({
     SearchOutlined,
     DownloadOutlined,
     'carrousel-images': CarrouselImages,
+    dictionary: Dictionary,
   },
   setup() {
     const activeKey = ref([]);
@@ -240,8 +256,8 @@ export default defineComponent({
   },
   data() {
     const entrySelected = {
-      lemma: '',
-      letter: '',
+      lemma: [],
+      letter: [],
       context: '',
       UF: '',
       source: '',
@@ -291,10 +307,30 @@ export default defineComponent({
             10
           );
         }
-        this.$router.push({ name: 'entrySelection' });
+        this.candidateUFs = this.candidateUFs.filter(
+          (item) => item.id !== this.entrySelected.id
+        );
+        this.resetForm();
       } else {
         this.$message.error('Error, algo salió mal', 10);
       }
+    },
+    resetForm() {
+      this.entrySelected = {
+        lemma: [],
+        letter: [],
+        context: '',
+        UF: '',
+        source: '',
+        selected: false,
+        criteria: '',
+        frecuency: '',
+        included: '',
+        documentation: [],
+      };
+    },
+    goBack() {
+      this.$router.push({ name: 'lemario' });
     },
     radioSelect(e) {
       this.radio = e.target.value;
@@ -331,7 +367,8 @@ export default defineComponent({
       this.entrySource = s.data.getSourceByID;
       this.sourceType = this.entrySource.type;
       this.sourceSupport = this.entrySource.support;
-
+      this.radio = '';
+      this.images = [];
       let documentation = this.entrySelected.documentation;
       for (let index = 0; index < documentation.length; index++) {
         const element = documentation[index];

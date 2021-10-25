@@ -297,7 +297,7 @@ export default defineComponent({
       this.entryToEdit.source = this.selectedSource.id;
       EntryA.updateEntryByID(this.entryToEdit);
       console.log('this.entryToEdit', this.entryToEdit);
-      this.$router.push({ name: 'entries' });
+      this.$router.push({ name: 'extractionTask' });
     },
     //file Videos
     onFileSelectedV(event) {

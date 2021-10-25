@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :visible="visible"
-    title="Detalles de la Entrada"
+    title="Detalles de la Unidad Fraseológica Candidata"
     width="450px"
     :footer="null"
     @cancel="closeModal"
@@ -34,10 +34,10 @@
           :src="MINIO_URL_A + '/' + selectedEntry.context"
           controls
         ></audio>
-        <img
-          v-show="selectedEntry.context.split('_')[0] === 'Imagen'"
+        <a-image
+          v-show="selectedEntry.context.split('_')[0] === 'Image'"
           :src="MINIO_URL_A + '/' + selectedEntry.context"
-        />
+        ></a-image>
       </div>
     </a-form>
   </a-modal>

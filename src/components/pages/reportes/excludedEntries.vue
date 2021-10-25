@@ -1,22 +1,7 @@
 <template>
   <a-page-header>
     <template #title>
-      <h2>Unidades Fraseológicas Seleccionadas</h2>
-    </template>
-    <template #extra>
-      <a-tooltip
-        title="Lematizar Unidades Fraseológicas Seleccionadas"
-        placement="bottom"
-      >
-        <a-button
-          key="documentar"
-          type="primary"
-          style="margin-right: 5px"
-          @click="goLematization"
-        >
-          Lematizar UFs
-        </a-button>
-      </a-tooltip>
+      <h2>Unidades Fraseológicas Excluídas del Lemario</h2>
     </template>
   </a-page-header>
   <a-table
@@ -67,11 +52,6 @@
       <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
     </template>
     <template #operation="{ record }">
-      <a-tooltip
-        title="Seleccionar de la UF candidata"
-        placement="bottom"
-      ></a-tooltip>
-
       <a-tooltip title="Detalles de la UF candidata " placement="bottom">
         <a @click="ufDetailsModalShowMethod(record.entry)">
           <EyeFilled
@@ -86,19 +66,6 @@
           />
         </a>
       </a-tooltip>
-      <a-popconfirm
-        v-if="entries.length"
-        title="Seguro de Eliminar?"
-        @confirm="deleteUFByID(record.entry.id)"
-      >
-        <a-tooltip title="Eliminar UF candidata" placement="bottom">
-          <a>
-            <DeleteFilled
-              :style="{ fontSize: '20px', color: 'red', margin: '5px' }"
-            />
-          </a>
-        </a-tooltip>
-      </a-popconfirm>
     </template>
   </a-table>
   <entry-details-modal
@@ -145,8 +112,8 @@ export default defineComponent({
           title: 'UF',
           dataIndex: 'entry.UF',
           key: 'UF',
-          width: 200,
-          sorter: (a, b) => a.entry.UF.localeCompare(b.entry.UF),
+          width: 300,
+          sorter: (a, b) => a.entry.name.localeCompare(b.entry.name),
           slots: {
             filterDropdown: 'filterDropdown',
             filterIcon: 'filterIcon',
@@ -162,7 +129,7 @@ export default defineComponent({
           dataIndex: 'source.ref',
           key: 'source',
           width: 400,
-          sorter: (a, b) => a.source.ref.localeCompare(b.source.ref),
+          sorter: (a, b) => a.source.name.localeCompare(b.source.name),
           slots: {
             filterDropdown: 'filterDropdown',
             filterIcon: 'filterIcon',
@@ -175,27 +142,25 @@ export default defineComponent({
           },
         },
         {
-          title: 'Estado',
-          dataIndex: 'entry.included',
-          key: 'included',
-          width: 200,
-          sorter: (a, b) => a.entry.included.localeCompare(b.entry.included),
+          title: 'Frecuencia de Uso',
+          dataIndex: 'entry.frecuency',
+          key: 'frecuency',
+          sorter: (a, b) => a.entry.frecuency.localeCompare(b.entry.frecuency),
           slots: {
             filterDropdown: 'filterDropdown',
             filterIcon: 'filterIcon',
           },
           onFilter: (value, record) => {
-            return record.entry.included
+            return record.entry.frecuency
               .toString()
               .toLowerCase()
               .includes(value.toLowerCase());
           },
         },
         {
-          title: 'Anotaciones',
+          title: 'Criterio de exclusión',
           dataIndex: 'entry.criteria',
           key: 'criteria',
-          width: 200,
           sorter: (a, b) => a.entry.criteria.localeCompare(b.entry.criteria),
           slots: {
             filterDropdown: 'filterDropdown',
@@ -219,8 +184,8 @@ export default defineComponent({
     };
   },
   async mounted() {
-    const { data } = await EntryA.getAllIncludedEntries();
-    const entries = data.getAllIncludedEntries;
+    const { data } = await EntryA.getAllExcludedEntries();
+    const entries = data.getAllExcludedEntries;
     for (let index = 0; index < entries.length; index++) {
       const element = entries[index];
       const entrySource = {} as {
@@ -247,26 +212,11 @@ export default defineComponent({
     console.log();
   },
   methods: {
-    async deleteUFByID(id) {
-      let index = 0;
-      let found = false;
-      for (index; index < this.entries.length && !found; index++) {
-        const element = this.entries[index];
-        if (element.entry.id === id) {
-          found = true;
-        }
-      }
-      this.entries = this.entries.filter((item) => item.entry.id !== id);
-      await EntryA.deleteEntryByID(id);
-    },
     handleSearch: (confirm) => {
       confirm();
     },
     handleReset: (clearFilters) => {
       clearFilters();
-    },
-    goLematization() {
-      this.$router.push({ name: 'entryLematization' });
     },
     async ufDetailsModalShowMethod(entry) {
       this.selectedEntry = entry;
@@ -278,7 +228,7 @@ export default defineComponent({
     },
     goToEditEntryA(selectedEntry) {
       this.$router.push({
-        name: 'editEntryALemario',
+        name: 'editEntryAExcluded',
         params: {
           id: selectedEntry.id,
         },

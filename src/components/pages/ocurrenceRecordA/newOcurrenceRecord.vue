@@ -195,7 +195,7 @@
                 >
                   <a-select-option
                     v-for="dictionaryType in dictionariesTypes"
-                    :key="dictionaryType.id"
+                    :key="dictionaryType.nombre"
                   >
                     {{ dictionaryType.nombre }}
                   </a-select-option>
@@ -694,12 +694,15 @@ export default defineComponent({
     const formRefS = ref();
     const loading = false;
     const entryA = {
-      UF: '',
-      lemma: '',
-      source: '',
-      letter: '',
+      lemma: [{ lemma: '' }],
+      letter: [],
       context: '',
+      UF: '',
+      source: '',
       selected: false,
+      criteria: '',
+      frecuency: '',
+      included: '',
     };
     const addGenreModalShow = false;
     const addThemeModalShow = false;
@@ -762,16 +765,29 @@ export default defineComponent({
   },
   methods: {
     async submit() {
-      this.loading = true;
-      this.source.stage = 'Documentación';
-      const s = await this.createSource();
-      const sourceID = s.data.createSource.id;
-      this.ocurrenceRecord.source = sourceID;
-      if (this.images.length !== 0) {
-        await this.uploadFileImage();
+      if (
+        this.source.name !== '' &&
+        this.source.ref !== '' &&
+        this.source.type !== ''
+      ) {
+        if (this.images.length !== 0) {
+          this.loading = true;
+          this.source.stage = 'Documentación';
+          const s = await this.createSource();
+          const sourceID = s.data.createSource.id;
+          this.ocurrenceRecord.source = sourceID;
+          await this.uploadFileImage();
+          await this.createOcurrenceRecord();
+          this.$router.push({ name: 'documentationTask' });
+        } else {
+          this.$message.error(
+            'Debe incluir al menos una aparición de la Unidad Fraseológica seleccionada',
+            10
+          );
+        }
+      } else {
+        this.$message.error('Debe llenar los datos de la Fuente', 10);
       }
-      await this.createOcurrenceRecord();
-      this.$router.push({ name: 'documentationTask' });
     },
     afterVisibleChange(val) {
       console.log('visible', val);
@@ -846,7 +862,6 @@ export default defineComponent({
       let updatedID = eu.id;
       console.log('updatedID', updatedID);
       let u = await EntryA.updateEntryFrecuency(updatedID);
-      console.log('u', u.data.updateEntryFrecuency);
     },
     goBack() {
       this.$router.push({ name: 'documentationTask' });
@@ -888,7 +903,6 @@ export default defineComponent({
       console.log('claves', claves);
       for (let i = 0; i < claves.length; i++) {
         let clave = claves[i];
-        console.log(this.source[clave]);
         if (this.source[clave] === '') {
           this.source[clave] = '( No Definido )';
         }

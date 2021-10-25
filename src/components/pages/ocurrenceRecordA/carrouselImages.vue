@@ -23,30 +23,6 @@
         </span>
         <transition name="no-mode-fade">
           <div style="position: absolute">
-            <!-- <div v-if="activeImage === images.length"><h1>Pegar</h1></div>
-            <div v-else-if="activeImage === index">
-              <a-image
-                v-if="images[index].context !== ''"
-                class="img"
-                :src="MINIO_URL_A + '/' + images[index].context"
-                alt="Artículo lexicográfico"
-                :style="{
-                  border: '2px solid #fff',
-                  borderRadius: '10px',
-                  boxShadow: '5px 5px 5px #ccc',
-                }"
-              ></a-image>
-              <a-image
-                v-else
-                :src="images[index].base64"
-                alt="Artículo lexicográfico"
-                :style="{
-                  border: '2px solid #fff',
-                  borderRadius: '10px',
-                  boxShadow: '5px 5px 5px #ccc',
-                }"
-              ></a-image>
-            </div> -->
             <a-image
               :src="imageUrl"
               alt="Contexto de Uso"
@@ -172,9 +148,10 @@ export default defineComponent({
         ) {
           result = MINIO_URL_A + '/pasteImage.jpg';
         } else {
-          const context = props.images[activeImage.value].context;
+          const context = props.images[activeImage.value].useContext;
           const base64 = props.images[activeImage.value].base64;
-          if (context !== '') result = MINIO_URL_A + '/' + context;
+          if (context !== '' && context !== undefined)
+            result = MINIO_URL_A + '/' + context;
           else result = base64;
         }
       } else {

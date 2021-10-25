@@ -4,7 +4,9 @@ export const deleteEntryByIDMutation = gql`
   mutation deleteEntryByID($entryID: String!) {
     deleteEntryByID(entryID: $entryID) {
       id
-      lemma
+      lemma {
+        lemma
+      }
       letter
       context
       UF
@@ -21,7 +23,9 @@ export const deleteEntryDocByIDMutation = gql`
   mutation deleteEntryDocByID($entryID: String!, $orID: String!) {
     deleteEntryDocByID(entryID: $entryID, orID: $orID) {
       id
-      lemma
+      lemma {
+        lemma
+      }
       letter
       context
       UF
@@ -39,7 +43,9 @@ export const createEntryMutation = gql`
   mutation createEntry($createdEntry: NewEntryType!) {
     createEntry(createdEntry: $createdEntry) {
       id
-      lemma
+      lemma {
+        lemma
+      }
       letter
       context
       UF
@@ -56,7 +62,9 @@ export const updateEntryByIDMutation = gql`
   mutation updateEntryByID($newEntry: EditedEntryType!) {
     updateEntryByID(newEntry: $newEntry) {
       id
-      lemma
+      lemma {
+        lemma
+      }
       letter
       context
       UF
@@ -74,7 +82,9 @@ export const updateEntryDocumentationMutation = gql`
   mutation updateEntryDocumentation($newEntry: EditedEntryType!) {
     updateEntryDocumentation(newEntry: $newEntry) {
       id
-      lemma
+      lemma {
+        lemma
+      }
       letter
       context
       UF
@@ -92,7 +102,9 @@ export const updateEntryFrecuencyMutation = gql`
   mutation updateEntryFrecuency($entryID: String!) {
     updateEntryFrecuency(entryID: $entryID) {
       id
-      lemma
+      lemma {
+        lemma
+      }
       letter
       context
       UF

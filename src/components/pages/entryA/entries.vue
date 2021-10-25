@@ -146,7 +146,7 @@ export default defineComponent({
           dataIndex: 'entry.UF',
           key: 'UF',
           width: 300,
-          sorter: (a, b) => a.name.localeCompare(b.name),
+          sorter: (a, b) => a.entry.name.localeCompare(b.entry.name),
           slots: {
             filterDropdown: 'filterDropdown',
             filterIcon: 'filterIcon',
@@ -162,7 +162,7 @@ export default defineComponent({
           dataIndex: 'source.ref',
           key: 'source',
           width: 500,
-          sorter: (a, b) => a.name.localeCompare(b.name),
+          sorter: (a, b) => a.source.name.localeCompare(b.source.name),
           slots: {
             filterDropdown: 'filterDropdown',
             filterIcon: 'filterIcon',
@@ -192,15 +192,15 @@ export default defineComponent({
       const entrySource = {} as {
         entry: {
           id: String;
-          UF: String;
-          lemma: String;
-          source: String;
-          letter: String;
+          lemma: [{ lemma: String }];
+          letter: [];
           context: String;
+          UF: String;
+          source: String;
           selected: Boolean;
           criteria: String;
-          included: String;
           frecuency: String;
+          included: String;
           documentation: [];
         };
         source: {};

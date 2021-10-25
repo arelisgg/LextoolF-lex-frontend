@@ -47,10 +47,16 @@
             :label-col="labelCol"
             :wrapper-col="wrapperCol"
           >
-            <img
+            <a-image
               v-show="image !== null && showPreviewImage"
               :src="image.base64"
-            />
+              alt="Contexto de Uso"
+              :style="{
+                border: '2px solid #fff',
+                borderRadius: '10px',
+                boxShadow: '5px 5px 5px #ccc',
+              }"
+            ></a-image>
           </a-form-item>
           <a-form-item
             v-else
@@ -181,7 +187,7 @@
                   v-if="showPreviewAudio"
                   :options="options"
                   :default-value="['Linguística', 'Oral', 'Audio']"
-                  placeholder="Seleccione una Tipo"
+                  placeholder="Seleccione Tipo, Soporte, Medio"
                   :style="{ width: '350px' }"
                   @change="handleOptionsChange"
                 />
@@ -189,13 +195,13 @@
                   v-else-if="showPreview"
                   :options="options"
                   :default-value="['Linguística', 'Oral', 'Video']"
-                  placeholder="Seleccione una Tipo"
+                  placeholder="Seleccione Tipo, Soporte, Medio"
                   @change="handleOptionsChange"
                 />
                 <a-cascader
                   v-else
                   :options="options"
-                  placeholder="Seleccione una Tipo"
+                  placeholder="Seleccione Tipo, Soporte, Medio"
                   :style="{ width: '350px' }"
                   @change="handleOptionsChange"
                 />
@@ -598,7 +604,7 @@ import AddSessionModal from './Nomenclators/addSessionModal.vue';
 import AddDictionaryTypeModal from './Nomenclators/addDictionaryTypeModal.vue';
 import AddTypologyModal from './Nomenclators/addTypologyModal.vue';
 
-import { defineComponent, ref } from 'vue';
+import { defineComponent, reactive, ref, toRaw } from 'vue';
 import {
   InboxOutlined,
   PlusOutlined,
@@ -770,18 +776,24 @@ export default defineComponent({
       },
     };
     const formRef = ref();
+    const formState = reactive({
+      name: undefined,
+      type: undefined,
+      ref: undefined,
+      UF: undefined,
+    });
     const formRefS = ref();
     const loading = false;
     const entryA = {
-      UF: '',
-      lemma: '',
-      source: '',
-      letter: '',
+      lemma: [{ lemma: '' }],
+      letter: [],
       context: '',
+      UF: '',
+      source: '',
       selected: false,
       criteria: '',
-      included: '',
       frecuency: '',
+      included: '',
     };
     const addGenreModalShow = false;
     const addThemeModalShow = false;
@@ -814,6 +826,7 @@ export default defineComponent({
       loading,
       entryA,
       formRef,
+      formState,
       rules,
       selectedFile: null,
       image: {
@@ -862,40 +875,57 @@ export default defineComponent({
   },
   methods: {
     async submit() {
-      if (this.selectedFile) {
-        if (/\.(mp4|avi|x-m4v)$/i.test(this.selectedFile.name)) {
-          this.uploadFileVideo();
+      if (
+        this.source.name !== '' &&
+        this.source.ref !== '' &&
+        this.source.type !== ''
+      ) {
+        if (this.selectedFile) {
+          if (/\.(mp4|avi|x-m4v)$/i.test(this.selectedFile.name)) {
+            this.uploadFileVideo();
+          }
+          if (
+            /\.(mp3|m4a|wav|wma|flac|aac|opus)$/i.test(this.selectedFile.name)
+          ) {
+            this.uploadFileAudio();
+          }
         }
-        if (
-          /\.(mp3|m4a|wav|wma|flac|aac|opus)$/i.test(this.selectedFile.name)
-        ) {
-          this.uploadFileAudio();
+        if (this.image.file !== null) {
+          this.uploadFileImage();
         }
+        this.source.stage = 'Extracción';
+        const s = await this.createSource();
+        const sourceID = s.data.createSource.id;
+        this.createEntryA(sourceID);
+        this.$router.push({ name: 'firstExtraction' });
+      } else {
+        this.$message.error('Debe llenar los datos de la Fuente', 10);
       }
-      if (this.image.file !== null) {
-        this.uploadFileImage();
-      }
-      this.source.stage = 'Extracción';
-      const s = await this.createSource();
-      const sourceID = s.data.createSource.id;
-      this.createEntryA(sourceID);
-      this.$router.push({ name: 'firstExtraction' });
     },
     radioSelect(e) {
       this.radio = e.target.value;
     },
     next() {
-      if (this.showPreviewAudio) {
-        this.source.type = 'Linguística';
-        this.source.subType = 'Oral';
-        this.source.support = 'Audio';
+      if (this.entryA.UF !== '') {
+        if (this.selectedFile !== null || this.image.file !== null) {
+          if (this.showPreviewAudio) {
+            this.source.type = 'Linguística';
+            this.source.subType = 'Oral';
+            this.source.support = 'Audio';
+          }
+          if (this.showPreview) {
+            this.source.type = 'Linguística';
+            this.source.subType = 'Oral';
+            this.source.support = 'Video';
+          }
+          this.current++;
+        }
+      } else {
+        this.$message.error(
+          'Debe llenar los datos de la UF y seleccionar un archivo',
+          10
+        );
       }
-      if (this.showPreview) {
-        this.source.type = 'Linguística';
-        this.source.subType = 'Oral';
-        this.source.support = 'Video';
-      }
-      this.current++;
     },
     prev() {
       this.current--;

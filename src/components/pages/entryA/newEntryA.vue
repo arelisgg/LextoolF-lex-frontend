@@ -21,7 +21,16 @@
         :label-col="labelCol"
         :wrapper-col="wrapperCol"
       >
-        <img v-show="image !== null && showPreviewImage" :src="image.base64" />
+        <a-image
+          v-show="image !== null && showPreviewImage"
+          :src="image.base64"
+          alt="Contexto de Uso"
+          :style="{
+            border: '2px solid #fff',
+            borderRadius: '10px',
+            boxShadow: '5px 5px 5px #ccc',
+          }"
+        ></a-image>
       </a-form-item>
       <a-form-item
         v-else
@@ -157,15 +166,15 @@ export default defineComponent({
     const formRef = ref();
     const loading = false;
     const entryA = {
-      UF: '',
-      lemma: '',
-      source: '',
-      letter: '',
+      lemma: [{ lemma: '' }],
+      letter: [],
       context: '',
+      UF: '',
+      source: '',
       selected: false,
       criteria: '',
-      included: '',
       frecuency: '',
+      included: '',
     };
     return {
       image: {

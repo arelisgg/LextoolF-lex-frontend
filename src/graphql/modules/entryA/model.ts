@@ -10,6 +10,7 @@ import {
   getAllEntriesToSelectQuery,
   getAllExcludedEntriesQuery,
   getAllIncludedEntriesQuery,
+  getAllEntriesOfLemarioQuery,
 } from './querys';
 import { FetchPolicy, apolloClientA } from '@/graphql/apolloProvider';
 import {
@@ -139,6 +140,15 @@ export class EntryA {
   static getAllExcludedEntries() {
     return apolloQuery(
       getAllExcludedEntriesQuery,
+      null,
+      FetchPolicy.network_only,
+      apolloClientA
+    );
+  }
+
+  static getAllEntriesOfLemario() {
+    return apolloQuery(
+      getAllEntriesOfLemarioQuery,
       null,
       FetchPolicy.network_only,
       apolloClientA

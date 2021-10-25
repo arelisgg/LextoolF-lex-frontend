@@ -57,7 +57,7 @@ export default defineComponent({
       {
         text: 'Diccionario Fraseológico',
         icon: 'ion-ios-book',
-        to: { name: 'entries' },
+        to: { name: 'dictionaryA' },
       },
       {
         text: 'Proyecto de Lemario',
@@ -77,6 +77,37 @@ export default defineComponent({
             text: 'Selección de UF',
             icon: 'ion-ios-book',
             to: { name: 'entrySelection' },
+          },
+          {
+            text: 'Lematización',
+            icon: 'ion-ios-book',
+            to: { name: 'lemario' },
+          },
+          {
+            text: 'Lemario',
+            icon: 'ion-ios-book',
+            to: { name: 'lemarioFinal' },
+          },
+        ],
+      },
+      {
+        text: 'Reportes',
+        icon: 'ion-ios-book',
+        children: [
+          {
+            text: 'Fuentes de Extracción',
+            icon: 'ion-ios-book',
+            to: { name: 'extractionSources' },
+          },
+          {
+            text: 'Fuentes de Documentación',
+            icon: 'ion-ios-book',
+            to: { name: 'documentationSources' },
+          },
+          {
+            text: 'Entradas Excluídas',
+            icon: 'ion-ios-book',
+            to: { name: 'excludedEntries' },
           },
         ],
       },
