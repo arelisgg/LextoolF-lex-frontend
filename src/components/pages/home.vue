@@ -11,7 +11,7 @@
         Módulo de gestión del lemario como parte de la confección de un
         diccionario de fraseologismos
       </p>
-      <a-button @click="onSources">Fuentes</a-button>
+      <a-button @click="onSources">Comenzar Extracción</a-button>
     </a-card>
   </a-space>
 </template>
