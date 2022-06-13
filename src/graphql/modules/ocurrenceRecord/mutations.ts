@@ -46,7 +46,7 @@ export const editOcurrenceRecordMutation = gql`
 `;
 
 export const editORAppearancesMutation = gql`
-  mutation editORAppearances($newOcurrenceRecord: NewOcurrenceRecordType!) {
+  mutation editORAppearances($newOcurrenceRecord: EditedOcurrenceRecordType!) {
     editORAppearances(newOcurrenceRecord: $newOcurrenceRecord) {
       id
       source

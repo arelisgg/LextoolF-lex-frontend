@@ -1,6 +1,6 @@
 <template>
   <div class="br-logo">
-    <a href="index.html">
+    <a href="home">
       <h2 class="mb-1 ml-2">
         <span class="text-primary">Lex</span>
         <span class="fw-500">tool &#402;</span>

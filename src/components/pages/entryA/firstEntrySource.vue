@@ -40,7 +40,7 @@
         <div v-show="radio === 1">
           <croppie-modal @crop="crop"></croppie-modal>
           <a-form-item
-            v-if="image !== null && showPreviewImage"
+            v-if="image.file !== null && showPreviewImage"
             ref="context"
             label="Contexto"
             name="context"
@@ -48,7 +48,7 @@
             :wrapper-col="wrapperCol"
           >
             <a-image
-              v-show="image !== null && showPreviewImage"
+              v-show="image.file !== null && showPreviewImage"
               :src="image.base64"
               alt="Contexto de Uso"
               :style="{
@@ -196,6 +196,7 @@
                   :options="options"
                   :default-value="['Linguística', 'Oral', 'Video']"
                   placeholder="Seleccione Tipo, Soporte, Medio"
+                  :style="{ width: '350px' }"
                   @change="handleOptionsChange"
                 />
                 <a-cascader
@@ -604,7 +605,7 @@ import AddSessionModal from './Nomenclators/addSessionModal.vue';
 import AddDictionaryTypeModal from './Nomenclators/addDictionaryTypeModal.vue';
 import AddTypologyModal from './Nomenclators/addTypologyModal.vue';
 
-import { defineComponent, reactive, ref, toRaw } from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import {
   InboxOutlined,
   PlusOutlined,
@@ -839,7 +840,6 @@ export default defineComponent({
       showPreviewImage: false,
       showPreview: false,
       audioPreview: '',
-      imagePreview: '',
       videoPreview: '',
       uploadProgress: 0,
       uploadProgressAudio: 0,
@@ -875,35 +875,98 @@ export default defineComponent({
   },
   methods: {
     async submit() {
-      if (
-        this.source.name !== '' &&
-        this.source.ref !== '' &&
-        this.source.type !== ''
-      ) {
-        if (this.selectedFile) {
-          if (/\.(mp4|avi|x-m4v)$/i.test(this.selectedFile.name)) {
-            this.uploadFileVideo();
-          }
-          if (
-            /\.(mp3|m4a|wav|wma|flac|aac|opus)$/i.test(this.selectedFile.name)
-          ) {
-            this.uploadFileAudio();
-          }
-        }
-        if (this.image.file !== null) {
-          this.uploadFileImage();
-        }
-        this.source.stage = 'Extracción';
-        const s = await this.createSource();
-        const sourceID = s.data.createSource.id;
-        this.createEntryA(sourceID);
-        this.$router.push({ name: 'firstExtraction' });
+      if (this.selectedFile && this.image.file !== null) {
+        this.$message.error(
+          'Tiene cargado dos formatos de archivo distinto, inicie nuevamente',
+          10
+        );
+        this.resetForm();
+        this.audioPreview = '';
+        this.videoPreview = '';
+        this.showPreviewAudio = false;
+        this.showPreviewImage = false;
+        this.showPreview = false;
+        this.selectedFile = null;
+        this.image = {
+          base64: null,
+          file: null,
+        };
       } else {
-        this.$message.error('Debe llenar los datos de la Fuente', 10);
+        if (
+          this.source.name !== '' &&
+          this.source.ref !== '' &&
+          this.source.type !== ''
+        ) {
+          if (this.selectedFile && this.image.file === null) {
+            if (/\.(mp4|avi|x-m4v)$/i.test(this.selectedFile.name)) {
+              this.uploadFileVideo();
+            }
+            if (
+              /\.(mp3|m4a|wav|wma|flac|aac|opus)$/i.test(this.selectedFile.name)
+            ) {
+              this.uploadFileAudio();
+            }
+          }
+          if (this.image.file !== null) {
+            this.uploadFileImage();
+          }
+          this.source.stage = 'Extracción';
+          const s = await this.createSource();
+          const sourceID = s.data.createSource.id;
+          this.createEntryA(sourceID);
+          this.$router.push({ name: 'firstExtraction' });
+        } else {
+          this.$message.error('Debe llenar los datos de la Fuente', 10);
+        }
       }
     },
     radioSelect(e) {
       this.radio = e.target.value;
+    },
+    resetForm() {
+      this.entryA = {
+        lemma: [{ lemma: '' }],
+        letter: [],
+        context: '',
+        UF: '',
+        source: '',
+        selected: false,
+        criteria: '',
+        frecuency: '',
+        included: '',
+      };
+      this.source = {
+        name: '',
+        ref: '',
+        type: '',
+        subType: '',
+        support: '',
+        stage: '',
+
+        // linguisticas libro o prensa
+        bloque: 'Ficción',
+        theme: '',
+        provice_p: '',
+        session_p: '',
+        magazine_type_p: '',
+
+        //linguisticas internet
+        URL: '',
+
+        //linguisticas audio o video
+        cantMin: '',
+        broadcastMedium: '',
+        typology: '',
+        speaker: '',
+        recording_date: '',
+        broadcast_date: '',
+
+        //metalinguisticas
+        dictionaryType: '',
+        century: '',
+        library_name: '',
+        url_location: '',
+      };
     },
     next() {
       if (this.entryA.UF !== '') {

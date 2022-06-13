@@ -647,6 +647,7 @@ export default defineComponent({
       let sourceType = source.type;
       let sourceSubType = source.subType;
       this.closeSelectToEditModal();
+      this.$store.entryA = this.entrySelected;
       ////// edit appearnces
       if (
         selectedOption === 'appearances' &&

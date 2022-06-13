@@ -861,7 +861,7 @@ export default defineComponent({
       const eu = updated.data.updateEntryDocumentation;
       let updatedID = eu.id;
       console.log('updatedID', updatedID);
-      let u = await EntryA.updateEntryFrecuency(updatedID);
+      await EntryA.updateEntryFrecuency(updatedID);
     },
     goBack() {
       this.$router.push({ name: 'documentationTask' });

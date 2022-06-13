@@ -148,6 +148,7 @@ import CarrouselImages from '../carrouselImages.vue';
 import CroppieModal from '../../entryA/VueCroppie/CroppieModal.vue';
 import { OcurrenceRecord } from '@/graphql/modules/ocurrenceRecord/model';
 import { axiosClientPostImage } from '@/plugins/axios';
+import { EntryA } from '@/graphql/modules/entryA/model';
 
 export default defineComponent({
   components: {
@@ -229,6 +230,9 @@ export default defineComponent({
     async editOcurrenceRecord() {
       console.log('this.roToEdit', this.roToEdit);
       await OcurrenceRecord.editORAppearances(this.roToEdit);
+      let id = this.$store.entryA.id;
+      console.log('id', id);
+      await EntryA.updateEntryFrecuency(id);
     },
     //file image
     uploadFileImage() {

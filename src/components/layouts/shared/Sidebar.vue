@@ -1,6 +1,6 @@
 <template>
   <div class="br-sideleft overflow-y-auto">
-    <label class="sidebar-label pd-x-15 mg-t-20">Menú</label>
+    <label class="sidebar-label pd-x-10 mg-t-10">Menú</label>
     <div class="br-sideleft-menu">
       <template v-for="link in links" :key="link.text">
         <router-link
@@ -10,7 +10,7 @@
           class="br-menu-link"
         >
           <div class="br-menu-item">
-            <i :class="link.icon" class="menu-item-icon icon tx-25"></i>
+            <i :class="link.icon" class="menu-item-icon icon tx-24"></i>
             <span class="menu-item-label">{{ link.text }}</span>
             <i
               v-if="link.children"
@@ -20,7 +20,7 @@
         </router-link>
         <div v-else class="u-pointer br-menu-link show-sub">
           <div class="br-menu-item">
-            <i class="menu-item-icon icon ion-ios-filing-outline tx-24"></i>
+            <i class="menu-item-icon icon ion-ios-list-outline tx-24"></i>
             <span class="menu-item-label">{{ link.text }}</span>
             <i class="menu-item-arrow fa fa-angle-down"></i>
           </div>
@@ -60,53 +60,43 @@ export default defineComponent({
         to: { name: 'dictionaryA' },
       },
       {
-        text: 'Proyecto de Lemario',
-        icon: 'ion-ios-book',
+        text: 'Gestión del Lemario',
         children: [
           {
             text: 'Extracción de UF',
-            icon: 'ion-ios-book',
             to: { name: 'firstExtraction' },
           },
           {
             text: 'Documentar UF',
-            icon: 'ion-ios-book',
             to: { name: 'entries' },
           },
           {
             text: 'Selección de UF',
-            icon: 'ion-ios-book',
             to: { name: 'entrySelection' },
           },
           {
             text: 'Lematización',
-            icon: 'ion-ios-book',
             to: { name: 'lemario' },
           },
           {
             text: 'Lemario',
-            icon: 'ion-ios-book',
             to: { name: 'lemarioFinal' },
           },
         ],
       },
       {
         text: 'Reportes',
-        icon: 'ion-ios-book',
         children: [
           {
             text: 'Fuentes de Extracción',
-            icon: 'ion-ios-book',
             to: { name: 'extractionSources' },
           },
           {
             text: 'Fuentes de Documentación',
-            icon: 'ion-ios-book',
             to: { name: 'documentationSources' },
           },
           {
             text: 'Entradas Excluídas',
-            icon: 'ion-ios-book',
             to: { name: 'excludedEntries' },
           },
         ],
@@ -121,6 +111,11 @@ export default defineComponent({
 .menu-item-label {
   font-weight: 500;
 }
+
+.br-menu-item {
+  padding: 0 10px !important;
+}
+
 .br-menu-link.active {
   color: #fff;
   background: #0a1017;
